@@ -1,4 +1,4 @@
-OBJ_FILES = $(DST)/lexer.o $(DST)/main.o
+OBJ_FILES = $(DST)/lexer.o $(DST)/main.o $(DST)/util.o
 EXEC = run
 DST = ../dst
 INCLUDE = ../include
