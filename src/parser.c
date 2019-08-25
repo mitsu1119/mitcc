@@ -11,12 +11,23 @@ AST *expr() {
 }
 
 AST *mul() {
-	AST *ast = primary();
+	AST *ast = unary();
 	while(true) {
-		if(consume('*')) ast = newAST(AST_MUL, ast, primary());
-		else if(consume('/')) ast = newAST(AST_DIV, ast, primary());
+		if(consume('*')) ast = newAST(AST_MUL, ast, unary());
+		else if(consume('/')) ast = newAST(AST_DIV, ast, unary());
 		else return ast;
 	}
+}
+
+AST *unary() {
+	AST *ast;
+	if(consume('-')) {
+		ast = newAST(AST_SUB, newNumAST(0), primary());
+	} else {
+		consume('+');
+		ast = primary();
+	}
+	return ast;
 }
 
 AST *primary() {

@@ -4,6 +4,7 @@
 
 AST *expr();
 AST *mul();
+AST *unary();
 AST *primary();
 
 void genStack(AST *ast);
