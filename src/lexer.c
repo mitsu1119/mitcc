@@ -48,7 +48,7 @@ Token *lexer(char *p) {
 			continue;
 		}
 
-		if(*p == '+' || *p == '-') {
+		if(*p == '+' || *p == '-' || *p == '*' || *p == '/') {
 			current = newToken(TK_RESERVED, current, p++);
 			continue;
 		}
