@@ -3,9 +3,12 @@
 #include "lexer.h"
 
 AST *expr();
-AST *mul();
-AST *unary();
-AST *primary();
+AST *equality();
+AST *inequality();
+AST *polynomial();
+AST *term();
+AST *sign();
+AST *factor();
 
 void genStack(AST *ast);
 

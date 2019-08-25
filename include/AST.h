@@ -3,7 +3,7 @@
 
 // AST type.
 typedef enum {
-	AST_ADD, AST_SUB, AST_MUL, AST_DIV, AST_NUM
+	AST_ADD, AST_SUB, AST_MUL, AST_DIV, AST_LESS, AST_LESSEQ, AST_EQ, AST_NUM
 } ASTType;
 
 // AST sets.
