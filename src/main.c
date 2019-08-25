@@ -5,11 +5,12 @@
 // extern Token *nowToken;
 int main(int argc, char *argv[]) {
 	if(argc != 2) {
-		error("引数の数が正しくありません。");
+		error(0, "引数の数が正しくありません。");
 		return 1;
 	}
 
-	nowToken = lexer(argv[1]);
+	userInput = argv[1];
+	nowToken = lexer(userInput);
 
 	// Output assembly base.
 	printf(".intel_syntax noprefix\n");

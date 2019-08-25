@@ -4,5 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void error(char *fmt, ...);
+char *userInput;
+
+void error(char *loc, char *fmt, ...);
 

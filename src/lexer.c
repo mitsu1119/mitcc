@@ -9,13 +9,13 @@ bool consume(char op) {
 
 // If next token is expected reserved word, read token. Otherwise output error.
 void expect(char op) {
-	if(nowToken->kind != TK_RESERVED || nowToken->str[0] != op) error("'%c'ではありません。", op);
+	if(nowToken->kind != TK_RESERVED || nowToken->str[0] != op) error(nowToken->str, "'%c'ではありません。", op);
 	nowToken = nowToken->next;
 }
 
 // If next token is number token, read token and return the value. Otherwise output error.
 int expectNumber() {
-	if(nowToken->kind != TK_NUM) error("数ではありません。");
+	if(nowToken->kind != TK_NUM) error(nowToken->str, "数ではありません。");
 	int val = nowToken->val;
 	nowToken = nowToken->next;
 	return val;
@@ -58,8 +58,7 @@ Token *lexer(char *p) {
 			current->val = strtol(p, &p, 10);
 			continue;
 		}
-
-		error("'%c': 不明な入力です。", *p);
+		error(p, "'%c': 不明な入力です。", *p);		
 	}
 	newToken(TK_EOF, current, p);
 	return head.next;
