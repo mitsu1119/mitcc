@@ -1,7 +1,10 @@
-<expr> 			= <equality>
+<program>		= <statement>*
+<statement>		= <expr> ";"
+<expr>			= <assign>
+<assign>		= <equality> ("=" assign)?
 <equality> 		= <inequality> ("==" <inequality> | "!=" <inequality>)*
 <inequality> 	= <polynomial> ("<" <polynomial> | "<=" <polynomial> | ">" <polynomial> | ">=" <polynomial>)*
 <polynomial> 	= ("+" <term> | "-" <term>)*
 <term> 			= <sign> ("*" <sign> | "/" <sign>)*
 <sign> 			= ("+" | "-")? <factor>
-<factor> 		= [0-9]+ | "(" <expr> ")"
+<factor> 		= NUMBER | IDENTIFIER | "(" <expr> ")"

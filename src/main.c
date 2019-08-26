@@ -6,23 +6,37 @@
 
 // extern Token *nowToken;
 int main(int argc, char *argv[]) {
-	if(argc != 2) {
+	/*if(argc != 2) {
 		error(0, "引数の数が正しくありません。");
 		return 1;
 	}
 
-	userInput = argv[1];
+	userInput = argv[1];*/
+
+	scanf("%100[^\n]%*[^\n]", userInput);
 	nowToken = lexer(userInput);
-	AST *ast = expr();
+	program();
 
 	// Output assembly base.
 	printf(".intel_syntax noprefix\n");
 	printf(".global main\n");
 	printf("main:\n");
 
-	genStack(ast);
+	// Prologue
+	printf("	push rbp\n");
+	printf("	mov rbp, rsp\n");
+	printf("	sub rsp, 208\n");
 
-	printf("	pop rax\n");
+	for(int i = 0; code[i]; i++) {
+		genStack(code[i]);
+
+		// Pop expression evaluation result.
+		printf("	pop rax\n");
+	}
+
+	// Epilogue
+	printf("	mov rsp, rbp\n");
+	printf("	pop rbp\n");
 	printf("	ret\n");
 
 	return 0;

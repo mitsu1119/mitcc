@@ -1,7 +1,27 @@
 #include "parser.h"
 
+void program() {
+	int i = 0;
+	while(!isEOF()) {
+		code[i++] = statement();
+	}
+	code[i] = NULL;
+}
+
+AST *statement() {
+	AST *ast = expr();
+	expect(";");
+	return ast;
+}
+
 AST *expr() {
-	return equality();
+	return assign();
+}
+
+AST *assign() {
+	AST *ast = equality();
+	if(consume("=")) ast = newAST(AST_ASSIGN, ast, assign());
+	return ast;
 }
 
 AST *equality() {
@@ -59,13 +79,65 @@ AST *factor() {
 		expect(")");
 		return ast;
 	}
+
+	Token *token = consumeIdentifier();
+	if(token) {
+		ast = calloc(1, sizeof(AST));
+		ast->type = AST_LVAR;
+		LVar *lvar = searchLVar(token);
+		if(lvar) {
+			ast->offset = lvar->offset;
+		} else {
+			lvar = calloc(1, sizeof(LVar));
+			lvar->next = lvars;
+			lvar->name = token->str;
+			lvar->len = token->len;	
+			if(lvars) lvar->offset = lvars->offset + 8;
+			else lvar->offset = 8;
+			ast->offset = lvar->offset;
+			lvars = lvar;
+		}
+		return ast;
+	}
+
 	ast = newNumAST(expectNumber());
 	return ast;
 }
 
+// Search local variable.
+LVar *searchLVar(Token *token) {
+	for(LVar *var = lvars; var; var = var->next) {
+		if(var->len == token->len && !strncmp(token->str, var->name, token->len)) return var;
+	}
+	return NULL;
+}
+
+// Evaluate the lvalue. If ast type is AST_LVAR, calculate the local variable address and push. Otherwise output error.
+void genLval(AST *ast) {
+	if(ast->type != AST_LVAR) error(0, "代入の左辺値が不正です。");
+	printf("	mov rax, rbp\n");
+	printf("	sub rax, %d\n", ast->offset);
+	printf("	push rax\n");
+}
+
 void genStack(AST *ast) {
-	if(ast->type == AST_NUM) {
+	switch(ast->type) {
+	case AST_NUM:
 		printf("	push %d\n", ast->val);
+		return;
+	case AST_ASSIGN:
+		genLval(ast->lhs);
+		genStack(ast->rhs);
+		printf("	pop rdi\n");
+		printf("	pop rax\n");
+		printf("	mov [rax], rdi\n");
+		printf("	push rdi\n");
+		return;
+	case AST_LVAR:
+		genLval(ast);
+		printf("	pop rax\n");
+		printf("	mov rax, [rax]\n");
+		printf("	push rax\n");
 		return;
 	}
 

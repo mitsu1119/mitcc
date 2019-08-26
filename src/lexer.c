@@ -2,7 +2,7 @@
 
 char checkSingleletterReserved(char p) {
 	// Punctutor.
-	static char spuncts[] = {'+', '-', '*', '/', '>', '<'};
+	static char spuncts[] = {'+', '-', '*', '/', '>', '<', ';', '='};
 	for(int i = 0; i < sizeof(spuncts) / sizeof(char); i++) {
 		if(p == spuncts[i]) return spuncts[i];
 	}
@@ -38,6 +38,14 @@ int expectNumber() {
 	int val = nowToken->val;
 	nowToken = nowToken->next;
 	return val;
+}
+
+// If next token is identifier token, read token and return the token pointer. Otherwise return NULL.
+Token *consumeIdentifier() {
+	if(nowToken->kind != TK_IDENT) return NULL;
+	Token *oldToken = nowToken;
+	nowToken = nowToken->next;
+	return oldToken;
 }
 
 // Check EOF.
@@ -80,6 +88,13 @@ Token *lexer(char *p) {
 		char c = checkSingleletterReserved(*p);
 		if(c != 0) {
 			current = newToken(TK_RESERVED, current, p++, 1);
+			continue;
+		}
+
+		if(isalpha(*p) || *p == '_') {
+			char *q = p++;
+			while(isalnum(*p) || *p == '_') p++;
+			current = newToken(TK_IDENT, current, q, p - q);
 			continue;
 		}
 

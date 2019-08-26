@@ -9,10 +9,11 @@
 
 // Token data
 // TK_RESERVED	: Reserved word.
+// TK_IDENT		: Identifier token.
 // TK_NUM		: Number token.
 // TK_EOF		: File end.
 typedef enum {
-	TK_RESERVED, TK_NUM, TK_EOF
+	TK_RESERVED, TK_IDENT, TK_NUM, TK_EOF
 } TokenKind;
 
 // Token type
@@ -20,9 +21,9 @@ typedef struct Token Token;
 struct Token {
 	TokenKind kind;		// Token type.
 	Token *next;		// Next input token.
-	int val;			// TokenKind: The number (TK_NUM).
 	char *str;			// Token string.
 	int len;			// Token length.
+	int val;			// TokenKind: The number (TK_NUM).
 };
 
 Token *nowToken;
@@ -38,6 +39,9 @@ void expect(char *op);
 
 // If next token is number token, read token and return the value. Otherwise output error.
 int expectNumber();
+
+// If next token is identifier token, read token and return the token pointer. Otherwise return NULL.
+Token *consumeIdentifier();
 
 // Check EOF.
 bool isEOF();
