@@ -10,6 +10,12 @@ char checkSingleletterReserved(char p) {
 }
 
 char *checkMultiletterReserved(char *p) {
+	// Keyword.
+	static char *mkeywords[] = {"return"};
+	for(int i = 0; i < sizeof(mkeywords) / sizeof(*mkeywords); i++) {
+		if(!strncmp(p, mkeywords[i], strlen(mkeywords[i])) && !isalnum(p[strlen(mkeywords[i])]) && p[strlen(mkeywords[i])] != '_') return mkeywords[i];
+	}
+
 	// Punctutor.
 	static char *mpuncts[] = {"==", "<=", ">="};
 	for(int i = 0; i < sizeof(mpuncts) / sizeof(*mpuncts); i++) {
@@ -22,6 +28,13 @@ char *checkMultiletterReserved(char *p) {
 // If next token is expected reserved word, read token and return true. Otherwise return false.
 bool consume(char *op) {
 	if(nowToken->kind != TK_RESERVED || strlen(op) != nowToken->len || strncmp(nowToken->str, op, nowToken->len)) return false;
+	nowToken = nowToken->next;
+	return true;
+}
+
+// If next token's kind is expected kind, read token and return true. Otherwise return false.
+bool consumeKind(TokenKind kind) {
+	if(nowToken->kind != kind) return false;
 	nowToken = nowToken->next;
 	return true;
 }
@@ -80,7 +93,11 @@ Token *lexer(char *p) {
 		char *ch = checkMultiletterReserved(p);
 		if(ch) {
 			int len = strlen(ch);
-			current = newToken(TK_RESERVED, current, p, len);
+			if(!strncmp(ch, "return", 6)) {
+				current = newToken(TK_RETURN, current, p, len);
+			} else {
+				current = newToken(TK_RESERVED, current, p, len);
+			}
 			p += len;
 			continue;
 		}

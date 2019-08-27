@@ -1,5 +1,6 @@
 <program>		= <statement>*
 <statement>		= <expr> ";"
+				  | "return" <expr> ";"
 <expr>			= <assign>
 <assign>		= <equality> ("=" assign)?
 <equality> 		= <inequality> ("==" <inequality> | "!=" <inequality>)*

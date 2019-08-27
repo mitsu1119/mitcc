@@ -8,12 +8,12 @@
 #include "util.h"
 
 // Token data
-// TK_RESERVED	: Reserved word.
-// TK_IDENT		: Identifier token.
-// TK_NUM		: Number token.
-// TK_EOF		: File end.
 typedef enum {
-	TK_RESERVED, TK_IDENT, TK_NUM, TK_EOF
+	TK_RESERVED,	// Reserved work.
+	TK_IDENT, 		// Identifier token.
+	TK_RETURN,		// Return token.
+	TK_NUM,			// Number token.
+	TK_EOF			// File end.
 } TokenKind;
 
 // Token type
@@ -33,6 +33,9 @@ char *checkMultiletterReserved(char *p);
 
 // If next token is expected reserved word, read token and return true. Otherwise return false.
 bool consume(char *op);
+
+// If next token's kind is expected kind, read token and return true. Otherwise return false.
+bool consumeKind(TokenKind kind);
 
 // If next token is expected reserved word, read token. Otherwise output error.
 void expect(char *op);

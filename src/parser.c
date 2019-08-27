@@ -9,7 +9,10 @@ void program() {
 }
 
 AST *statement() {
-	AST *ast = expr();
+	AST *ast;
+	if(consumeKind(TK_RETURN)) ast = newAST(AST_RETURN, expr(), NULL);
+	else ast = expr();
+
 	expect(";");
 	return ast;
 }
@@ -139,6 +142,13 @@ void genStack(AST *ast) {
 		printf("	mov rax, [rax]\n");
 		printf("	push rax\n");
 		return;
+	case AST_RETURN:
+		genStack(ast->lhs);
+		printf("	pop rax\n");
+		printf("	mov rsp, rbp\n");
+		printf("	pop rbp\n");
+		printf("	ret\n");
+		return;	
 	}
 
 	genStack(ast->lhs);

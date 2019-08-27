@@ -11,6 +11,7 @@ typedef enum {
 	AST_LESSEQ,		// a <= b
 	AST_EQ,			// a == b
 	AST_ASSIGN,		// a = b
+	AST_RETURN,		// return a
 	AST_LVAR,		// a
 	AST_NUM,		// [0-9]+
 } ASTType;
