@@ -1,9 +1,9 @@
 #pragma once
 #include "AST.h"
 #include "lexer.h"
+#include "gen.h"
 
 AST *code[100];
-int labelCnt;
 
 typedef struct LVar LVar;
 struct LVar {
@@ -28,10 +28,4 @@ AST *factor();
 
 // Search local variable.
 LVar *searchLVar(Token *token);
-
-// Evaluate the lvalue. If ast type is AST_LVAR, calculate the local variable address and push. Otherwise output error.
-void genLval(AST *ast);
-
-// Generate assembly code from ast.
-void genStack(AST *ast);
 

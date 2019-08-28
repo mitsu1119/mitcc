@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include "lexer.h"
-#include "AST.h"
 #include "parser.h"
-#include "util.h"
+#include "gen.h"
 
 // extern Token *nowToken;
 int main(int argc, char *argv[]) {
