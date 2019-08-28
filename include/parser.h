@@ -3,6 +3,7 @@
 #include "lexer.h"
 
 AST *code[100];
+int labelCnt;
 
 typedef struct LVar LVar;
 struct LVar {

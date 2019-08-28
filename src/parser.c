@@ -1,6 +1,8 @@
 #include "parser.h"
 
 void program() {
+	labelCnt = 0;
+
 	int i = 0;
 	while(!isEOF()) {
 		code[i++] = statement();
@@ -10,10 +12,22 @@ void program() {
 
 AST *statement() {
 	AST *ast;
-	if(consumeKind(TK_RETURN)) ast = newAST(AST_RETURN, expr(), NULL);
-	else ast = expr();
+	if(consumeKind(TK_RETURN)) {
+		ast = newAST(AST_RETURN, expr(), NULL);
+		expect(";");
+		return ast;
+	} else if(consumeKind(TK_IF)) {
+		expect("(");
+		ast = newAST(AST_IF, NULL, NULL);
+		ast->cond = expr();
+		expect(")");
+		ast->lhs = statement();
+		return ast;
+	} else {
+		ast = expr();
+		expect(";");
+	}
 
-	expect(";");
 	return ast;
 }
 
@@ -124,6 +138,8 @@ void genLval(AST *ast) {
 }
 
 void genStack(AST *ast) {
+	int labelBuf;
+
 	switch(ast->type) {
 	case AST_NUM:
 		printf("	push %d\n", ast->val);
@@ -141,6 +157,15 @@ void genStack(AST *ast) {
 		printf("	pop rax\n");
 		printf("	mov rax, [rax]\n");
 		printf("	push rax\n");
+		return;
+	case AST_IF:
+		genStack(ast->cond);
+		printf("	pop rax\n");
+		printf("	cmp rax, 0\n");
+		printf("	je .Lifend%d\n", labelCnt);
+		labelBuf = labelCnt++;
+		genStack(ast->lhs);
+		printf(".Lifend%d:\n", labelBuf);
 		return;
 	case AST_RETURN:
 		genStack(ast->lhs);

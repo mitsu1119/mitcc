@@ -11,6 +11,7 @@ typedef enum {
 	AST_LESSEQ,		// a <= b
 	AST_EQ,			// a == b
 	AST_ASSIGN,		// a = b
+	AST_IF,			// if(a)
 	AST_RETURN,		// return a
 	AST_LVAR,		// a
 	AST_NUM,		// [0-9]+
@@ -23,6 +24,7 @@ struct AST {
 	AST *lhs, *rhs;
 	int val;			// The value (AST_NUM).	
 	int offset;			// Local variable offset (AST_LVAR).
+	AST *cond;			// Condinate expression (AST_IF).
 };
 
 AST *newAST(ASTType type, AST *lhs, AST *rhs);

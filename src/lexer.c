@@ -2,7 +2,7 @@
 
 char checkSingleletterReserved(char p) {
 	// Punctutor.
-	static char spuncts[] = {'+', '-', '*', '/', '>', '<', ';', '='};
+	static char spuncts[] = {'+', '-', '*', '/', '>', '<', ';', '=', '(', ')'};
 	for(int i = 0; i < sizeof(spuncts) / sizeof(char); i++) {
 		if(p == spuncts[i]) return spuncts[i];
 	}
@@ -11,7 +11,7 @@ char checkSingleletterReserved(char p) {
 
 char *checkMultiletterReserved(char *p) {
 	// Keyword.
-	static char *mkeywords[] = {"return"};
+	static char *mkeywords[] = {"return", "if"};
 	for(int i = 0; i < sizeof(mkeywords) / sizeof(*mkeywords); i++) {
 		if(!strncmp(p, mkeywords[i], strlen(mkeywords[i])) && !isalnum(p[strlen(mkeywords[i])]) && p[strlen(mkeywords[i])] != '_') return mkeywords[i];
 	}
@@ -95,6 +95,8 @@ Token *lexer(char *p) {
 			int len = strlen(ch);
 			if(!strncmp(ch, "return", 6)) {
 				current = newToken(TK_RETURN, current, p, len);
+			} else if(!strncmp(ch, "if", 2)) {
+				current = newToken(TK_IF, current, p, len);
 			} else {
 				current = newToken(TK_RESERVED, current, p, len);
 			}
