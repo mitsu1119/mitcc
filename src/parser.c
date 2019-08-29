@@ -116,19 +116,25 @@ AST *factor() {
 	Token *token = consumeIdentifier();
 	if(token) {
 		ast = calloc(1, sizeof(AST));
-		ast->type = AST_LVAR;
-		LVar *lvar = searchLVar(token);
-		if(lvar) {
-			ast->offset = lvar->offset;
+		if(!consume("(")) {
+			ast->type = AST_LVAR;
+			LVar *lvar = searchLVar(token);
+			if(lvar) {
+				ast->offset = lvar->offset;
+			} else {
+				lvar = calloc(1, sizeof(LVar));
+				lvar->next = lvars;
+				lvar->name = token->str;
+				lvar->len = token->len;	
+				if(lvars) lvar->offset = lvars->offset + 8;
+				else lvar->offset = 8;
+				ast->offset = lvar->offset;
+				lvars = lvar;
+			}
 		} else {
-			lvar = calloc(1, sizeof(LVar));
-			lvar->next = lvars;
-			lvar->name = token->str;
-			lvar->len = token->len;	
-			if(lvars) lvar->offset = lvars->offset + 8;
-			else lvar->offset = 8;
-			ast->offset = lvar->offset;
-			lvars = lvar;
+			ast->type = AST_CALL;
+			ast->calledFunc = token;
+			expect(")");
 		}
 		return ast;
 	}

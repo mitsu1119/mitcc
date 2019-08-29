@@ -12,4 +12,4 @@
 <polynomial> 	= ("+" <term> | "-" <term>)*
 <term> 			= <sign> ("*" <sign> | "/" <sign>)*
 <sign> 			= ("+" | "-")? <factor>
-<factor> 		= NUMBER | IDENTIFIER | "(" <expr> ")"
+<factor> 		= NUMBER | IDENTIFIER ("(" ")")? | "(" <expr> ")"

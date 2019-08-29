@@ -1,4 +1,5 @@
 #pragma once
+#include "lexer.h"
 #include "parser.h"
 #include "AST.h"
 
