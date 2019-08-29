@@ -1,7 +1,9 @@
 <program>		= <statement>*
 <statement>		= <expr> ";"
+				  | "{" <statement>* "}"
 				  | "if" "(" <expr> ")" <statement> ("else" <statement>)?
 				  | "while" "(" <expr> ")" <statement>
+				  | "for" "(" 
 				  | "return" <expr> ";"
 <expr>			= <assign>
 <assign>		= <equality> ("=" assign)?

@@ -12,7 +12,16 @@ void program() {
 
 AST *statement() {
 	AST *ast;
-	if(consumeKind(TK_RETURN)) {
+	if(consume("{")) {
+		ast = newAST(AST_LIST, NULL, NULL);
+		AST *block = ast;
+		while(!consume("}")) {
+			block->lhs = statement();
+			block->rhs = newAST(AST_LIST, NULL, NULL);
+			block = block->rhs;
+		}
+		return ast;
+	} else if(consumeKind(TK_RETURN)) {
 		ast = newAST(AST_RETURN, expr(), NULL);
 		expect(";");
 		return ast;

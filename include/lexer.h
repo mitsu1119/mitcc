@@ -11,6 +11,7 @@
 typedef enum {
 	TK_RESERVED,	// Reserved work.
 	TK_IDENT, 		// Identifier token.
+	TK_BLOCK,		// Block token.
 	TK_IF,			// If token.
 	TK_ELSE,		// If-else token.
 	TK_WHILE,		// While token.

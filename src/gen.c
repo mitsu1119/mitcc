@@ -67,6 +67,13 @@ void genStack(AST *ast) {
 		printf("	pop rbp\n");
 		printf("	ret\n");
 		return;	
+	case AST_LIST:
+		if(ast->lhs != NULL) {
+			genStack(ast->lhs);
+			printf("	pop rax\n");
+			genStack(ast->rhs);
+		}
+		return;
 	}
 
 	genStack(ast->lhs);
