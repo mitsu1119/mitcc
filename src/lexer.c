@@ -2,7 +2,7 @@
 
 char checkSingleletterReserved(char p) {
 	// Punctutor.
-	static char spuncts[] = {'+', '-', '*', '/', '>', '<', ';', '=', '(', ')', '{', '}'};
+	static char spuncts[] = {'+', '-', '*', '/', '>', '<', ';', '=', '(', ')', '{', '}', ','};
 	for(int i = 0; i < sizeof(spuncts) / sizeof(char); i++) {
 		if(p == spuncts[i]) return spuncts[i];
 	}

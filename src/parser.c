@@ -13,11 +13,11 @@ void program() {
 AST *statement() {
 	AST *ast;
 	if(consume("{")) {
-		ast = newAST(AST_LIST, NULL, NULL);
+		ast = newAST(AST_BLOCK, NULL, NULL);
 		AST *block = ast;
 		while(!consume("}")) {
 			block->lhs = statement();
-			block->rhs = newAST(AST_LIST, NULL, NULL);
+			block->rhs = newAST(AST_BLOCK, NULL, NULL);
 			block = block->rhs;
 		}
 		return ast;
@@ -134,12 +134,33 @@ AST *factor() {
 		} else {
 			ast->type = AST_CALL;
 			ast->calledFunc = token;
-			expect(")");
+			ast->lhs = NULL;
+			if(!consume(")")) {
+				ast->lhs = args();
+				expect(")");
+			}
 		}
 		return ast;
 	}
 
 	ast = newNumAST(expectNumber());
+	return ast;
+}
+
+AST *args() {
+	AST *ast = newAST(AST_ARGS, expr(), NULL);
+	ast->rhs = argsp();
+	return ast;
+}
+
+AST *argsp() {
+	AST *ast = newAST(AST_ARGS, NULL, NULL);
+	if(!consume(",")) {
+		return ast;
+	} 
+	ast->lhs = expr();
+	ast->rhs = argsp();
+
 	return ast;
 }
 

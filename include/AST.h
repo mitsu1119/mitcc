@@ -12,14 +12,15 @@ typedef enum {
 	AST_LESSEQ,		// a <= b
 	AST_EQ,			// a == b
 	AST_ASSIGN,		// a = b
+	AST_ARGS,		// foo(a, b, c)
+	AST_BLOCK,		// { stmt1 stmt2 } statement list (AST_BLOCK). 
 	AST_IF,			// if(a)
 	AsT_IF_ELSE,	// if(a) b else c
 	AST_WHILE,		// while(a) b
 	AST_RETURN,		// return a
 	AST_LVAR,		// a
 	AST_CALL,		// func()
-	AST_NUM,		// [0-9]+
-	AST_LIST		// list (AST_BLOCK and so on)
+	AST_NUM			// [0-9]+
 } ASTType;
 
 // AST sets.

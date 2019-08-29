@@ -25,6 +25,8 @@ AST *polynomial();
 AST *term();
 AST *sign();
 AST *factor();
+AST *args();
+AST *argsp();
 
 // Search local variable.
 LVar *searchLVar(Token *token);

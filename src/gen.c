@@ -9,7 +9,7 @@ void genLval(AST *ast) {
 }
 
 void genStack(AST *ast) {
-	int labelBuf;
+	int labelBuf, cnt = 0;
 
 	switch(ast->type) {
 	case AST_NUM:
@@ -28,6 +28,20 @@ void genStack(AST *ast) {
 		printf("	pop rax\n");
 		printf("	mov rax, [rax]\n");
 		printf("	push rax\n");
+		return;
+	case AST_ARGS:
+		while(ast->lhs != NULL) {
+			genStack(ast->lhs);
+			printf("	pop %s\n", regNames[cnt++]);
+			ast = ast->rhs;
+		}
+		return;
+	case AST_BLOCK:
+		if(ast->lhs != NULL) {
+			genStack(ast->lhs);
+			printf("	pop rax\n");
+			genStack(ast->rhs);
+		}
 		return;
 	case AST_IF:
 		genStack(ast->cond);
@@ -68,14 +82,8 @@ void genStack(AST *ast) {
 		printf("	ret\n");
 		return;	
 	case AST_CALL:
+		if(ast->lhs != NULL) genStack(ast->lhs);
 		printf("	call %.*s\n", ast->calledFunc->len, ast->calledFunc->str);
-		return;
-	case AST_LIST:
-		if(ast->lhs != NULL) {
-			genStack(ast->lhs);
-			printf("	pop rax\n");
-			genStack(ast->rhs);
-		}
 		return;
 	}
 
