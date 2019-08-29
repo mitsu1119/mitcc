@@ -12,6 +12,7 @@ typedef enum {
 	TK_RESERVED,	// Reserved work.
 	TK_IDENT, 		// Identifier token.
 	TK_IF,			// If token.
+	TK_ELSE,		// If-else token.
 	TK_RETURN,		// Return token.
 	TK_NUM,			// Number token.
 	TK_EOF			// File end.

@@ -33,10 +33,21 @@ void genStack(AST *ast) {
 		genStack(ast->cond);
 		printf("	pop rax\n");
 		printf("	cmp rax, 0\n");
-		printf("	je .Lifend%d\n", labelCnt);
-		labelBuf = labelCnt++;
-		genStack(ast->lhs);
-		printf(".Lifend%d:\n", labelBuf);
+		if(ast->rhs != NULL) {			// if-else
+			printf("	je .Lifelse%d\n", labelCnt);
+			labelBuf = labelCnt++;
+			genStack(ast->lhs);
+			printf("	jmp .Lifend%d\n", labelCnt);
+			printf(".Lifelse%d:\n", labelBuf);
+			labelBuf = labelCnt++;
+			genStack(ast->rhs);
+			printf(".Lifend%d:\n", labelBuf);
+		} else {
+			printf("	je .Lifend%d\n", labelCnt);
+			labelBuf = labelCnt++;
+			genStack(ast->lhs);
+			printf(".Lifend%d:\n", labelBuf);
+		}
 		return;
 	case AST_RETURN:
 		genStack(ast->lhs);

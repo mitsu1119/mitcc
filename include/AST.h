@@ -12,6 +12,7 @@ typedef enum {
 	AST_EQ,			// a == b
 	AST_ASSIGN,		// a = b
 	AST_IF,			// if(a)
+	AsT_IF_ELSE,	// if(a) b else c
 	AST_RETURN,		// return a
 	AST_LVAR,		// a
 	AST_NUM,		// [0-9]+

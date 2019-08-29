@@ -21,7 +21,8 @@ AST *statement() {
 		ast = newAST(AST_IF, NULL, NULL);
 		ast->cond = expr();
 		expect(")");
-		ast->lhs = statement();
+		ast->lhs = statement();		// Then statement.
+		if(consumeKind(TK_ELSE)) ast->rhs = statement();	// Else statement.
 		return ast;
 	} else {
 		ast = expr();

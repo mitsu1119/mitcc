@@ -11,7 +11,7 @@ char checkSingleletterReserved(char p) {
 
 char *checkMultiletterReserved(char *p) {
 	// Keyword.
-	static char *mkeywords[] = {"return", "if"};
+	static char *mkeywords[] = {"return", "if", "else"};
 	for(int i = 0; i < sizeof(mkeywords) / sizeof(*mkeywords); i++) {
 		if(!strncmp(p, mkeywords[i], strlen(mkeywords[i])) && !isalnum(p[strlen(mkeywords[i])]) && p[strlen(mkeywords[i])] != '_') return mkeywords[i];
 	}
@@ -97,6 +97,8 @@ Token *lexer(char *p) {
 				current = newToken(TK_RETURN, current, p, len);
 			} else if(!strncmp(ch, "if", 2)) {
 				current = newToken(TK_IF, current, p, len);
+			} else if(!strncmp(ch, "else", 4)) {
+				current = newToken(TK_ELSE, current, p, len);
 			} else {
 				current = newToken(TK_RESERVED, current, p, len);
 			}
