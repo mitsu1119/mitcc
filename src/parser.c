@@ -24,6 +24,12 @@ AST *statement() {
 		ast->lhs = statement();		// Then statement.
 		if(consumeKind(TK_ELSE)) ast->rhs = statement();	// Else statement.
 		return ast;
+	} else if(consumeKind(TK_WHILE)) {
+		expect("(");
+		ast = newAST(AST_WHILE, NULL, NULL);
+		ast->cond = expr();
+		expect(")");
+		ast->lhs = statement();
 	} else {
 		ast = expr();
 		expect(";");
