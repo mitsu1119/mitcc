@@ -61,6 +61,14 @@ Token *consumeIdentifier() {
 	return oldToken;
 }
 
+// If next token is identifier token ,read token and return the token pointer. Otherwise output error.
+Token *expectIdentifier() {
+	if(nowToken->kind != TK_IDENT) error(nowToken->str, "識別子ではありません。");
+	Token *oldToken = nowToken;
+	nowToken = nowToken->next;
+	return oldToken;
+}
+
 // Check EOF.
 bool isEOF() {
 	return nowToken->kind == TK_EOF;

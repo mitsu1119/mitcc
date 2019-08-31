@@ -19,24 +19,26 @@ int main(int argc, char *argv[]) {
 	// Output assembly base.
 	printf(".intel_syntax noprefix\n");
 	printf(".global main\n");
-	printf("main:\n");
 
-	// Prologue
-	printf("	push rbp\n");
-	printf("	mov rbp, rsp\n");
-	printf("	sub rsp, 208\n");
+	for(Func *func = funcs; func; func = func->next) {
+		printf("%.*s:\n", func->len, func->name);
 
-	for(int i = 0; code[i]; i++) {
-		genStack(code[i]);
+		// Prologue
+		printf("	push rbp\n");
+		printf("	mov rbp, rsp\n");
+		printf("	sub rsp, 208\n");
+
+		genStack(func->body);
 
 		// Pop expression evaluation result.
 		printf("	pop rax\n");
-	}
 
-	// Epilogue
-	printf("	mov rsp, rbp\n");
-	printf("	pop rbp\n");
-	printf("	ret\n");
+
+		// Epilogue
+		printf("	mov rsp, rbp\n");
+		printf("	pop rbp\n");
+		printf("	ret\n");
+	}
 
 	return 0;
 }

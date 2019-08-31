@@ -50,6 +50,9 @@ int expectNumber();
 // If next token is identifier token, read token and return the token pointer. Otherwise return NULL.
 Token *consumeIdentifier();
 
+// If next token is identifier token ,read token and return the token pointer. Otherwise output error.
+Token *expectIdentifier();
+
 // Check EOF.
 bool isEOF();
 

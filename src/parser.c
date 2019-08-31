@@ -3,11 +3,34 @@
 void program() {
 	labelCnt = 0;
 
-	int i = 0;
 	while(!isEOF()) {
-		code[i++] = statement();
+		declare_func();
 	}
-	code[i] = NULL;
+}
+
+void declare_func() {
+	Token *token = expectIdentifier();
+	expect("(");
+	expect(")");
+	expect("{");
+	AST *ast = newAST(AST_BLOCK, NULL, NULL);
+	AST *block = ast;
+	while(!consume("}")) {
+		block->lhs = statement();
+		block->rhs = newAST(AST_BLOCK, NULL, NULL);
+		block = block->rhs;
+	}
+	Func *func = searchFunc(token);
+	if(func) {
+		error(0, "'%*s'が再定義されています。\n", token->len, token->str);
+	} else {
+		func = calloc(1, sizeof(Func));
+		func->next = funcs;
+		func->name = token->str;
+		func->len = token->len;
+		func->body = ast;
+		funcs = func;
+	}
 }
 
 AST *statement() {
@@ -168,6 +191,14 @@ AST *argsp() {
 LVar *searchLVar(Token *token) {
 	for(LVar *var = lvars; var; var = var->next) {
 		if(var->len == token->len && !strncmp(token->str, var->name, token->len)) return var;
+	}
+	return NULL;
+}
+
+// Search function.
+Func *searchFunc(Token *token) {
+	for(Func *func = funcs; func; func = func->next) {
+		if(func->len == token->len && !strncmp(token->str, func->name, token->len)) return func;
 	}
 	return NULL;
 }

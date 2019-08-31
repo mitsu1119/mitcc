@@ -3,7 +3,14 @@
 #include "lexer.h"
 #include "gen.h"
 
-AST *code[100];
+typedef struct Func Func;
+struct Func {
+	Func *next;		// Next function.
+	char *name;		// Function name.
+	int len;		// Name length.
+	AST *body;		// Main part.
+};
+Func *funcs;
 
 typedef struct LVar LVar;
 struct LVar {
@@ -12,10 +19,10 @@ struct LVar {
 	int len;		// Name length.
 	int offset;		// Offset from rbp.
 };
-
 LVar *lvars;
 
 void program();
+void declare_func();
 AST *statement();
 AST *expr();
 AST *assign();
@@ -30,4 +37,7 @@ AST *argsp();
 
 // Search local variable.
 LVar *searchLVar(Token *token);
+
+// Search function.
+Func *searchFunc(Token *token);
 
