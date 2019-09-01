@@ -1,5 +1,42 @@
 #include "gen.h"
 
+// Loading codes.
+int loadInput() {
+	scanf("%100[^\n]%*[^\n]", userInput);
+	nowToken = lexer(userInput);
+	program();
+}
+
+// Generate assembly code.
+void codeGen() {
+	// Output assembly base.
+	printf(".intel_syntax noprefix\n");
+	printf(".global main\n");
+
+	genFuncCode(funcs);
+}
+
+// Generate a function code.
+void genFuncCode(Func *function) {
+	if(function->next) genFuncCode(function->next);
+	printf("%.*s:\n", function->len, function->name);
+
+	// Prologue
+	printf("	push rbp\n");
+	printf("	mov rbp, rsp\n");
+	printf("	sub rsp, 208\n");
+
+	genStack(function->body);
+
+	// Pop expression evaluation result.
+	printf("	pop rax\n");
+
+	// Epilogue
+	printf("	mov rsp, rbp\n");
+	printf("	pop rbp\n");
+	printf("	ret\n");
+}
+
 // Evaluate the lvalue. If ast type is AST_LVAR, calculate the local variable address and push. Otherwise output error.
 void genLval(AST *ast) {
 	if(ast->type != AST_LVAR) error(0, "代入の左辺値が不正です。");

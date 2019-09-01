@@ -1,7 +1,9 @@
 #pragma once
 #include "AST.h"
 #include "lexer.h"
-#include "gen.h"
+
+// Label counter.
+int labelCnt;
 
 typedef struct Func Func;
 struct Func {

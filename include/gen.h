@@ -3,11 +3,17 @@
 #include "parser.h"
 #include "AST.h"
 
-// Label counter.
-int labelCnt;
+// Loading codes.
+int loadInput();
 
 // Registor name list sorted arguments list.
 static const char *regNames[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
+
+// Generate assembly code
+void codeGen();
+
+// Generate a function code.
+void genFuncCode(Func *function);
 
 // Evaluate the lvalue. If ast type is AST_LVAR, calculate the local variable address and push. Otherwise output error.
 void genLval(AST *ast);
