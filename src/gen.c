@@ -26,7 +26,12 @@ void genFuncCode(Func *function) {
 	printf("	mov rbp, rsp\n");
 	printf("	sub rsp, 208\n");
 
-	if(function->arg) genStack(function->arg);
+	if(function->arg) {
+		genLval(function->arg);
+		printf("	pop rax\n");
+		printf("	mov [rax], %s\n", regNames[0]);
+		printf("	push %s\n", regNames[0]);
+	}
 	genStack(function->body);
 
 	// Pop expression evaluation result.
