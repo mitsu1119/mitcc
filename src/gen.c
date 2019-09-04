@@ -21,7 +21,7 @@ void codeGen() {
 
 // Generate a function code.
 void genFuncCode(Func *function) {
-	if(function->next) genFuncCode(function->next);
+	if(function && function->next) genFuncCode(function->next);
 	printf("%.*s:\n", function->len, function->name);
 
 	// Prologue
