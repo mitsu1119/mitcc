@@ -3,8 +3,11 @@
 
 // extern Token *nowToken;
 int main(int argc, char *argv[]) {
-
-	loadInput();
+	if(argc < 2) {
+		printf("引数が足りません。");
+		return -1;
+	}
+	loadInput(argv[1]);
 	codeGen();
 
 	return 0;

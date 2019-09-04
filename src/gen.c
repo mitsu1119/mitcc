@@ -1,8 +1,11 @@
 #include "gen.h"
 
 // Loading codes.
-int loadInput() {
-	scanf("%100[^\n]%*[^\n]", userInput);
+int loadInput(const char *filename) {
+	int fd = open(filename, O_RDONLY);
+	if(fd == -1) exit(1);
+	read(fd, userInput, sizeof(userInput) * sizeof(char));
+	close(fd);
 	nowToken = lexer(userInput);
 	program();
 }

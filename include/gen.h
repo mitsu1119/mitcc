@@ -1,10 +1,12 @@
 #pragma once
+#include <fcntl.h>
+#include <string.h>
 #include "lexer.h"
 #include "parser.h"
 #include "AST.h"
 
 // Loading codes.
-int loadInput();
+int loadInput(const char *filename);
 
 // Registor name list sorted arguments list.
 static const char *regNames[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
