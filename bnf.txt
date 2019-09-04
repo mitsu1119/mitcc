@@ -1,5 +1,5 @@
 <program>		= <declare_func>*
-<declare_func>	= IDENTIFIER "(" ")" "{" <statement>* "}"
+<declare_func>	= IDENTIFIER "(" (IDENTIFIER)? ")" "{" <statement>* "}"
 <statement>		= <expr> ";"
 				  | "{" <statement>* "}"
 				  | "if" "(" <expr> ")" <statement> ("else" <statement>)?

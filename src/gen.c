@@ -26,6 +26,7 @@ void genFuncCode(Func *function) {
 	printf("	mov rbp, rsp\n");
 	printf("	sub rsp, 208\n");
 
+	if(function->arg) genStack(function->arg);
 	genStack(function->body);
 
 	// Pop expression evaluation result.
@@ -121,6 +122,7 @@ void genStack(AST *ast) {
 	case AST_CALL:
 		if(ast->lhs != NULL) genStack(ast->lhs);
 		printf("	call %.*s\n", ast->calledFunc->len, ast->calledFunc->str);
+		printf("	push rax\n");
 		return;
 	}
 

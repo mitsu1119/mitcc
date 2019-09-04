@@ -11,6 +11,7 @@ struct Func {
 	char *name;		// Function name.
 	int len;		// Name length.
 	AST *body;		// Main part.
+	AST *arg;		// Arguments list.
 };
 Func *funcs;
 
