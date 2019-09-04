@@ -11,8 +11,13 @@ void program() {
 void declare_func() {
 	Token *token = expectIdentifier();
 	expect("(");
-	Token *arg = consumeIdentifier();
-	expect(")");
+	
+	AST *argAST = NULL;
+	if(!consume(")")) {
+		argAST = declare_args();
+		expect(")");
+	}
+	
 	expect("{");
 	AST *ast = newAST(AST_BLOCK, NULL, NULL);
 	AST *block = ast;
@@ -30,24 +35,6 @@ void declare_func() {
 		func->name = token->str;
 		func->len = token->len;
 		func->body = ast;
-		AST *argAST = NULL;
-		if(arg) {
-			argAST = calloc(1, sizeof(AST));
-			argAST->type = AST_LVAR;
-			LVar *lvar = searchLVar(arg);
-			if(lvar) {
-				argAST->offset = lvar->offset;
-			} else {
-				lvar = calloc(1, sizeof(LVar));
-				lvar->next = lvars;
-				lvar->name = arg->str;
-				lvar->len = arg->len;
-				if(lvars) lvar->offset = lvars->offset + 8;
-				else lvar->offset = 8;
-				argAST->offset = lvar->offset;
-				lvars = lvar;
-			}
-		}
 		func->arg = argAST;
 		funcs = func;
 	}
@@ -205,6 +192,51 @@ AST *argsp() {
 	ast->rhs = argsp();
 
 	return ast;
+}
+
+AST *declare_args() {
+	Token *arg = consumeIdentifier();
+	AST *ast = newAST(AST_LVAR, NULL, NULL);
+	LVar *lvar = searchLVar(arg);
+	if(lvar) {
+		ast->offset = lvar->offset;
+	} else {
+		lvar = calloc(1, sizeof(LVar));
+		lvar->next = lvars;
+		lvar->name = arg->str;
+		lvar->len = arg->len;
+		if(lvars) lvar->offset = lvars->offset + 8;
+		else lvar->offset = 8;
+		ast->offset = lvar->offset;
+		lvars = lvar;
+	}
+	AST *ret = newAST(AST_ARGDECS, ast, declare_argsp());
+	return ret;
+}
+
+AST *declare_argsp() {
+	AST *ret = newAST(AST_ARGDECS, NULL, NULL);
+	if(!consume(",")) {
+		return ret;
+	}
+	AST *ast = newAST(AST_LVAR, NULL, NULL);
+	Token *arg = expectIdentifier();
+	LVar *lvar = searchLVar(arg);
+	if(lvar) {
+		ast->offset = lvar->offset;
+	} else {
+		lvar = calloc(1, sizeof(LVar));
+		lvar->next = lvars;
+		lvar->name = arg->str;
+		lvar->len = arg->len;
+		if(lvars) lvar->offset = lvars->offset + 8;
+		else lvar->offset = 8;
+		ast->offset = lvar->offset;
+		lvars = lvar;
+	}
+	ret->lhs = ast;
+	ret->rhs = declare_argsp();
+	return ret;
 }
 
 // Search local variable.

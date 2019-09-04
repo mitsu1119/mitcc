@@ -26,12 +26,10 @@ void genFuncCode(Func *function) {
 	printf("	mov rbp, rsp\n");
 	printf("	sub rsp, 208\n");
 
-	if(function->arg) {
-		genLval(function->arg);
-		printf("	pop rax\n");
-		printf("	mov [rax], %s\n", regNames[0]);
-		printf("	push %s\n", regNames[0]);
-	}
+	// Arguments declaration
+	if(function->arg) genStack(function->arg);
+
+	// Main codes
 	genStack(function->body);
 
 	// Pop expression evaluation result.
@@ -55,6 +53,15 @@ void genStack(AST *ast) {
 	int labelBuf, cnt = 0;
 
 	switch(ast->type) {
+	case AST_ARGDECS:
+		while(ast->lhs) {
+			genLval(ast->lhs);
+			printf("	pop rax\n");
+			printf("	mov [rax], %s\n", regNames[cnt]);
+			printf("	push %s\n", regNames[cnt++]);
+			ast = ast->rhs;
+		}
+		return;
 	case AST_NUM:
 		printf("	push %d\n", ast->val);
 		return;

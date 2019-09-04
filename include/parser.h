@@ -37,6 +37,8 @@ AST *sign();
 AST *factor();
 AST *args();
 AST *argsp();
+AST *declare_args();
+AST *declare_argsp();
 
 // Search local variable.
 LVar *searchLVar(Token *token);
