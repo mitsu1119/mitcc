@@ -11,6 +11,8 @@ typedef enum {
 	AST_LESS,		// a < b
 	AST_LESSEQ,		// a <= b
 	AST_EQ,			// a == b
+	AST_ADDR,		// *a
+	AST_DEREF,		// &a
 	AST_ASSIGN,		// a = b
 	AST_ARGS,		// foo(1, 3*2, variable)
 	AST_BLOCK,		// { stmt1 stmt2 } statement list (AST_BLOCK). 

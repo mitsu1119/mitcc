@@ -6,7 +6,7 @@
 #include "AST.h"
 
 // Loading codes.
-int loadInput(const char *filename);
+int loadInput(const char *filename, const char *debugMode);
 
 // Registor name list sorted arguments list.
 static const char *regNames[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};

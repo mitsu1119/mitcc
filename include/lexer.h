@@ -59,6 +59,9 @@ bool isEOF();
 // Make new token and connect the token to current.
 Token *newToken(TokenKind kind, Token *current, char *str, int len);
 
+// Show token lists.
+void printTokens();
+
 // Lexer.
 Token *lexer(char *p);
 

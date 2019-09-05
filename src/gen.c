@@ -1,12 +1,14 @@
 #include "gen.h"
 
 // Loading codes.
-int loadInput(const char *filename) {
+int loadInput(const char *filename, const char *debugMode) {
 	int fd = open(filename, O_RDONLY);
 	if(fd == -1) exit(1);
 	read(fd, userInput, sizeof(userInput) * sizeof(char));
 	close(fd);
 	nowToken = lexer(userInput);
+
+	if(!strcmp(debugMode, "debug")) printTokens();
 	program();
 }
 
@@ -67,6 +69,15 @@ void genStack(AST *ast) {
 		return;
 	case AST_NUM:
 		printf("	push %d\n", ast->val);
+		return;
+	case AST_ADDR:
+		genLval(ast->lhs);
+		return;
+	case AST_DEREF:
+		genStack(ast->lhs);
+		printf("	pop rax\n");
+		printf("	mov rax, [rax]\n");
+		printf("	push rax\n");
 		return;
 	case AST_ASSIGN:
 		genLval(ast->lhs);

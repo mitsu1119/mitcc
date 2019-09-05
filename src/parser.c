@@ -128,8 +128,13 @@ AST *sign() {
 	AST *ast;
 	if(consume("-")) {
 		ast = newAST(AST_SUB, newNumAST(0), factor());
+	} else if(consume("+")) {
+		ast = factor();
+	} else if(consume("*")) {
+		ast = newAST(AST_DEREF, sign(), NULL);
+	} else if(consume("&")) {
+		ast = newAST(AST_ADDR, sign(), NULL);
 	} else {
-		consume("+");
 		ast = factor();
 	}
 	return ast;

@@ -2,7 +2,7 @@
 
 char checkSingleletterReserved(char p) {
 	// Punctutor.
-	static char spuncts[] = {'+', '-', '*', '/', '>', '<', ';', '=', '(', ')', '{', '}', ','};
+	static char spuncts[] = {'+', '-', '*', '/', '>', '<', ';', '=', '(', ')', '{', '}', ',', '&'};
 	for(int i = 0; i < sizeof(spuncts) / sizeof(char); i++) {
 		if(p == spuncts[i]) return spuncts[i];
 	}
@@ -41,7 +41,11 @@ bool consumeKind(TokenKind kind) {
 
 // If next token is expected reserved word, read token. Otherwise output error.
 void expect(char *op) {
-	if(nowToken->kind != TK_RESERVED || strlen(op) != nowToken->len || strncmp(nowToken->str, op, nowToken->len)) error(nowToken->str, "'%s'ではありません。", op);
+	if(nowToken->kind != TK_RESERVED || strlen(op) != nowToken->len || strncmp(nowToken->str, op, nowToken->len)) {
+		if(nowToken->kind == TK_NUM) printf("%d\n", nowToken->val);
+		else printf("%.*s\n", nowToken->len, nowToken->str);
+		error(nowToken->str, "'%s'ではありません。", op);
+	}
 	nowToken = nowToken->next;
 }
 
@@ -82,6 +86,19 @@ Token *newToken(TokenKind kind, Token *current, char *str, int len) {
 	token->len = len;
 	current->next = token;
 	return token;
+}
+
+// Show token lists.
+void printTokens() {
+	Token *token = nowToken;
+	printf("----------- Tokens ---------------\n");
+	while(token) {
+		if(token->kind == TK_NUM) printf("%d\n", token->val);
+		else if(token->kind == TK_EOF) printf("EOF\n");
+		else printf("%.*s\n", token->len, token->str);
+		token = token->next;
+	}
+	printf("----------------------------------\n");
 }
 
 // Lexer.

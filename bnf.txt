@@ -11,7 +11,7 @@
 <inequality> 	= <polynomial> ("<" <polynomial> | "<=" <polynomial> | ">" <polynomial> | ">=" <polynomial>)*
 <polynomial> 	= ("+" <term> | "-" <term>)*
 <term> 			= <sign> ("*" <sign> | "/" <sign>)*
-<sign> 			= ("+" | "-")? <factor>
+<sign> 			= ("+" | "-")? <factor> | ("*" | "&")? <sign>
 <factor> 		= NUMBER | IDENTIFIER ("(" <args>? ")")? | "(" <expr> ")"
 
 <args>			= <expr> <argsp>
