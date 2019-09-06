@@ -9,6 +9,7 @@ void program() {
 }
 
 void declare_func() {
+	expect("int");
 	Token *token = expectIdentifier();
 	expect("(");
 	
@@ -200,6 +201,7 @@ AST *argsp() {
 }
 
 AST *declare_args() {
+	expect("int");
 	Token *arg = consumeIdentifier();
 	AST *ast = newAST(AST_LVAR, NULL, NULL);
 	LVar *lvar = searchLVar(arg);
@@ -225,6 +227,7 @@ AST *declare_argsp() {
 		return ret;
 	}
 	AST *ast = newAST(AST_LVAR, NULL, NULL);
+	expect("int");
 	Token *arg = expectIdentifier();
 	LVar *lvar = searchLVar(arg);
 	if(lvar) {
