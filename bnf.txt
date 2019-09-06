@@ -1,6 +1,7 @@
 <program>		= <declare_func>*
 <declare_func>	= "int" IDENTIFIER "(" ("int" IDENTIFIER)? ")" "{" <statement>* "}"
 <statement>		= <expr> ";"
+				  | "int" IDENTIFIER ";"
 				  | "{" <statement>* "}"
 				  | "if" "(" <expr> ")" <statement> ("else" <statement>)?
 				  | "while" "(" <expr> ")" <statement>

@@ -29,7 +29,7 @@ void declare_func() {
 	}
 	Func *func = searchFunc(token);
 	if(func) {
-		error(0, "'%*s'が再定義されています。\n", token->len, token->str);
+		error(0, "'%.*s'が再定義されています。", token->len, token->str);
 	} else {
 		func = calloc(1, sizeof(Func));
 		func->next = funcs;
@@ -42,8 +42,25 @@ void declare_func() {
 }
 
 AST *statement() {
-	AST *ast;
-	if(consume("{")) {
+	AST *ast;	
+	if(consume("int")) {
+		Token *token = expectIdentifier();
+		ast = newAST(AST_LVAR, NULL, NULL);
+		LVar *lvar = searchLVar(token);
+		if(lvar) {
+			error(token->str, "'%.*s'が複数回宣言されています。", token->len, token->str);
+		}
+		lvar = calloc(1, sizeof(LVar));
+		lvar->next = lvars;
+		lvar->name = token->str;
+		lvar->len = token->len;
+		if(lvars) lvar->offset = lvars->offset + 8;
+		else lvar->offset = 8;
+		ast->offset = lvar->offset;
+		lvars = lvar;
+		expect(";");
+		return ast;
+	} else if(consume("{")) {
 		ast = newAST(AST_BLOCK, NULL, NULL);
 		AST *block = ast;
 		while(!consume("}")) {
@@ -158,14 +175,7 @@ AST *factor() {
 			if(lvar) {
 				ast->offset = lvar->offset;
 			} else {
-				lvar = calloc(1, sizeof(LVar));
-				lvar->next = lvars;
-				lvar->name = token->str;
-				lvar->len = token->len;	
-				if(lvars) lvar->offset = lvars->offset + 8;
-				else lvar->offset = 8;
-				ast->offset = lvar->offset;
-				lvars = lvar;
+				error(token->str, "変数'%.*s'が宣言されていません。", token->len, token->str);
 			}
 		} else {
 			ast->type = AST_CALL;
