@@ -54,6 +54,16 @@ AST *statement() {
 		lvar->next = lvars;
 		lvar->name = token->str;
 		lvar->len = token->len;
+
+		lvar->type = calloc(1, sizeof(Type));
+		Type *typeBuf = lvar->type;
+		while(consume("*")) {
+			typeBuf->type = PTR;
+			typeBuf->ptr = calloc(1, sizeof(Type));
+			typeBuf = typeBuf->ptr;
+		}
+		typeBuf->type = INT;
+
 		if(lvars) lvar->offset = lvars->offset + 8;
 		else lvar->offset = 8;
 		ast->offset = lvar->offset;

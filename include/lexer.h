@@ -20,6 +20,13 @@ typedef enum {
 	TK_EOF			// File end.
 } TokenKind;
 
+// Variable type
+typedef struct Type Type;
+struct Type {
+	enum {INT, PTR} type;
+	Type *ptr;
+};
+
 // Token type
 typedef struct Token Token;
 struct Token {

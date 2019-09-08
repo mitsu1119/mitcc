@@ -18,6 +18,7 @@ Func *funcs;
 typedef struct LVar LVar;
 struct LVar {
 	LVar *next;		// Next local variable.
+	Type *type;		// Lvar type.
 	char *name;		// Lvar name.
 	int len;		// Name length.
 	int offset;		// Offset from rbp.
