@@ -110,7 +110,9 @@ AST *expr() {
 }
 
 AST *assign() {
-	AST *ast = equality();
+	AST *ast;
+	if(consume("*")) ast = newAST(AST_DEREF, equality(), NULL);
+	else ast = equality();
 	if(consume("=")) ast = newAST(AST_ASSIGN, ast, assign());
 	return ast;
 }

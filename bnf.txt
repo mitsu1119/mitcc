@@ -7,7 +7,7 @@
 				  | "while" "(" <expr> ")" <statement>
 				  | "return" <expr> ";"
 <expr>			= <assign>
-<assign>		= <equality> ("=" assign)?
+<assign>		= "*"? <equality> ("=" <assign>)?
 <equality> 		= <inequality> ("==" <inequality> | "!=" <inequality>)*
 <inequality> 	= <polynomial> ("<" <polynomial> | "<=" <polynomial> | ">" <polynomial> | ">=" <polynomial>)*
 <polynomial> 	= ("+" <term> | "-" <term>)*

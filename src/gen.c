@@ -80,7 +80,8 @@ void genStack(AST *ast) {
 		printf("	push rax\n");
 		return;
 	case AST_ASSIGN:
-		genLval(ast->lhs);
+		if(ast->lhs->type != AST_DEREF) genLval(ast->lhs);
+		else genStack(ast->lhs->lhs);
 		genStack(ast->rhs);
 		printf("	pop rdi\n");
 		printf("	pop rax\n");
