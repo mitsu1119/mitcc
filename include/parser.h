@@ -1,6 +1,11 @@
 #pragma once
 #include "AST.h"
 #include "lexer.h"
+#include "type.h"
+
+typedef struct AST AST;
+typedef struct Type Type;
+typedef struct Token Token;
 
 // Label counter.
 int labelCnt;

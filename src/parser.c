@@ -66,7 +66,7 @@ AST *statement() {
 
 		if(lvars) lvar->offset = lvars->offset + 8;
 		else lvar->offset = 8;
-		ast->offset = lvar->offset;
+		ast->lvar = lvar;
 		lvars = lvar;
 		expect(";");
 		return ast;
@@ -138,10 +138,27 @@ AST *inequality() {
 
 AST *polynomial() {
 	AST *ast = term();
+	AST *right;
 	while(true) {
-		if(consume("+")) ast = newAST(AST_ADD, ast, term());
-		else if(consume("-")) ast = newAST(AST_SUB, ast, term());
-		else return ast;
+		if(consume("+")) {
+			right = term();
+			addType(ast);
+			addType(right);
+			if(ast->ty->kind == TY_INT && right->ty->kind == TY_INT) ast = newAST(AST_ADD, ast, right);
+			else if(ast->ty->ptr && ast->ty->kind == TY_INT) ast = newAST(AST_PTRADD, ast, right);
+			else if(ast->ty->kind == TY_INT && ast->ty->ptr) ast = newAST(AST_PTRADD, right, ast);
+			else error(nowToken->str, "'%.*s'不正なオペランドです。", nowToken->len, nowToken->str);
+		} else if(consume("-")) {
+			right = term();
+			addType(ast);
+			addType(right);
+			if(ast->ty->kind == TY_INT && right->ty->kind == TY_INT) ast = newAST(AST_SUB, ast, right);
+			else if(ast->ty->ptr && ast->ty->kind == TY_INT) ast = newAST(AST_PTRSUB, ast, right);
+			else if(ast->ty->kind == TY_INT && ast->ty->ptr) ast = newAST(AST_PTRDIFF, ast, right);
+			else error(nowToken->str, "'%.*s'不正なオペランドです。", nowToken->len, nowToken->str);
+		} else {
+			return ast;
+		}
 	}
 }
 
@@ -185,7 +202,7 @@ AST *factor() {
 			ast->type = AST_LVAR;
 			LVar *lvar = searchLVar(token);
 			if(lvar) {
-				ast->offset = lvar->offset;
+				ast->lvar = lvar;
 			} else {
 				error(token->str, "変数'%.*s'が宣言されていません。", token->len, token->str);
 			}
@@ -228,15 +245,23 @@ AST *declare_args() {
 	AST *ast = newAST(AST_LVAR, NULL, NULL);
 	LVar *lvar = searchLVar(arg);
 	if(lvar) {
-		ast->offset = lvar->offset;
+		ast->lvar = lvar;
 	} else {
 		lvar = calloc(1, sizeof(LVar));
 		lvar->next = lvars;
 		lvar->name = arg->str;
 		lvar->len = arg->len;
+		lvar->type = calloc(1, sizeof(Type));
+		Type *typeBuf = lvar->type;
+		while(consume("*")) {
+			typeBuf = newType(TY_PTR);
+			typeBuf->ptr = calloc(1, sizeof(Type));
+			typeBuf = typeBuf->ptr;
+		}
+		typeBuf->kind = TY_INT;
 		if(lvars) lvar->offset = lvars->offset + 8;
 		else lvar->offset = 8;
-		ast->offset = lvar->offset;
+		ast->lvar = lvar;
 		lvars = lvar;
 	}
 	AST *ret = newAST(AST_ARGDECS, ast, declare_argsp());
@@ -253,15 +278,23 @@ AST *declare_argsp() {
 	Token *arg = expectIdentifier();
 	LVar *lvar = searchLVar(arg);
 	if(lvar) {
-		ast->offset = lvar->offset;
+		ast->lvar = lvar;
 	} else {
 		lvar = calloc(1, sizeof(LVar));
 		lvar->next = lvars;
 		lvar->name = arg->str;
 		lvar->len = arg->len;
+		lvar->type = calloc(1, sizeof(Type));
+		Type *typeBuf = lvar->type;
+		while(consume("*")) {
+			typeBuf = newType(TY_PTR);
+			typeBuf->ptr = calloc(1, sizeof(Type));
+			typeBuf = typeBuf->ptr;
+		}
+		typeBuf->kind = TY_INT;
 		if(lvars) lvar->offset = lvars->offset + 8;
 		else lvar->offset = 8;
-		ast->offset = lvar->offset;
+		ast->lvar = lvar;
 		lvars = lvar;
 	}
 	ret->lhs = ast;

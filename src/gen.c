@@ -50,7 +50,7 @@ void genFuncCode(Func *function) {
 void genLval(AST *ast) {
 	if(ast->type != AST_LVAR) error(0, "代入の左辺値が不正です。");
 	printf("	mov rax, rbp\n");
-	printf("	sub rax, %d\n", ast->offset);
+	printf("	sub rax, %d\n", ast->lvar->offset);
 	printf("	push rax\n");
 }
 

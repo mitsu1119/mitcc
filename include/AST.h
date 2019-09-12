@@ -2,9 +2,11 @@
 #include <stdlib.h>
 #include "lexer.h"
 #include "type.h"
+#include "parser.h"
 
 typedef struct Type Type;
 typedef struct Token Token;
+typedef struct LVar LVar;
 
 // AST type.
 typedef enum {
@@ -12,6 +14,9 @@ typedef enum {
 	AST_SUB,		// a - b
 	AST_MUL,		// a * b
 	AST_DIV,		// a / b
+	AST_PTRADD,		// p + 1
+	AST_PTRSUB,		// p - 1
+	AST_PTRDIFF,	// p - q
 	AST_LESS,		// a < b
 	AST_LESSEQ,		// a <= b
 	AST_EQ,			// a == b
@@ -36,9 +41,10 @@ struct AST {
 	ASTType type;
 	AST *lhs, *rhs;
 	int val;			// The value (AST_NUM).	
-	int offset;			// Local variable offset (AST_LVAR).
+	LVar *lvar;			// Local variable (AST_LVAR).
 	AST *cond;			// Condinate expression (AST_IF, AST_WHILE).
 	Token *calledFunc;	// Called function token (AST_CALL).
+	Type *ty;			// Calc type. (TY_INT, TY_PTR, ...).
 };
 
 

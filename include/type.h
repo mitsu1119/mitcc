@@ -18,3 +18,6 @@ struct Type {
 // Make new type.
 Type *newType(TypeKind kind);
 
+// Add type for AST.
+void addType(AST *ast);
+
