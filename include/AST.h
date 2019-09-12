@@ -1,6 +1,10 @@
 #pragma once
 #include <stdlib.h>
 #include "lexer.h"
+#include "type.h"
+
+typedef struct Type Type;
+typedef struct Token Token;
 
 // AST type.
 typedef enum {
@@ -33,11 +37,10 @@ struct AST {
 	AST *lhs, *rhs;
 	int val;			// The value (AST_NUM).	
 	int offset;			// Local variable offset (AST_LVAR).
-	Type *varType;		// Local variable type (AST_LVAR).
 	AST *cond;			// Condinate expression (AST_IF, AST_WHILE).
-	AST *blockSt;		// Statements list in block (AST_BLOCK). lhs: Statement, rhs: Next Statement.
 	Token *calledFunc;	// Called function token (AST_CALL).
 };
+
 
 AST *newAST(ASTType type, AST *lhs, AST *rhs);
 AST *newNumAST(int val);

@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <math.h>
 #include <ctype.h>
+#include "type.h"
 #include "util.h"
 
 // Token data
@@ -19,13 +20,6 @@ typedef enum {
 	TK_NUM,			// Number token.
 	TK_EOF			// File end.
 } TokenKind;
-
-// Variable type
-typedef struct Type Type;
-struct Type {
-	enum {INT, PTR} type;
-	Type *ptr;
-};
 
 // Token type
 typedef struct Token Token;
