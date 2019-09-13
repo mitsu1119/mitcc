@@ -12,7 +12,9 @@
 <inequality> 	= <polynomial> ("<" <polynomial> | "<=" <polynomial> | ">" <polynomial> | ">=" <polynomial>)*
 <polynomial> 	= ("+" <term> | "-" <term>)*
 <term> 			= <sign> ("*" <sign> | "/" <sign>)*
-<sign> 			= ("+" | "-")? <factor> | ("*" | "&")? <sign>
+<sign> 			= ("+" | "-")? <factor>
+				  | ("*" | "&")? <sign>
+				  | "sizeof" <sign>
 <factor> 		= NUMBER | IDENTIFIER ("(" <args>? ")")? | "(" <expr> ")"
 
 <args>			= <expr> <argsp>

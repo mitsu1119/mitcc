@@ -17,6 +17,7 @@ typedef enum {
 	TK_ELSE,		// If-else token.
 	TK_WHILE,		// While token.
 	TK_RETURN,		// Return token.
+	TK_SIZEOF,		// Sizeof token.
 	TK_NUM,			// Number token.
 	TK_EOF			// File end.
 } TokenKind;

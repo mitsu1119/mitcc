@@ -182,6 +182,11 @@ AST *sign() {
 		ast = newAST(AST_DEREF, sign(), NULL);
 	} else if(consume("&")) {
 		ast = newAST(AST_ADDR, sign(), NULL);
+	} else if(consumeKind(TK_SIZEOF)) {
+		ast = sign();
+		addType(ast);
+		if(ast->ty->kind == TY_INT) ast = newNumAST(4);
+		else ast = newNumAST(8);
 	} else {
 		ast = factor();
 	}
