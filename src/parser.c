@@ -37,6 +37,8 @@ void declare_func() {
 		func->len = token->len;
 		func->body = ast;
 		func->arg = argAST;
+		func->lvars = lvars;	
+		lvars = NULL;
 		funcs = func;
 	}
 }

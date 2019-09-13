@@ -10,6 +10,7 @@ typedef struct Token Token;
 // Label counter.
 int labelCnt;
 
+typedef struct LVar LVar;
 typedef struct Func Func;
 struct Func {
 	Func *next;		// Next function.
@@ -17,10 +18,10 @@ struct Func {
 	int len;		// Name length.
 	AST *body;		// Main part.
 	AST *arg;		// Arguments list.
+	LVar *lvars;	// Local variables.
 };
 Func *funcs;
 
-typedef struct LVar LVar;
 struct LVar {
 	LVar *next;		// Next local variable.
 	Type *type;		// Lvar type.

@@ -29,7 +29,16 @@ void genFuncCode(Func *function) {
 	// Prologue
 	printf("	push rbp\n");
 	printf("	mov rbp, rsp\n");
-	printf("	sub rsp, 208\n");
+
+	if(!function->lvars) {
+		printf("	sub rsp, 0\n");
+	} else {
+		int subs = function->lvars->offset;
+		if(function->lvars->type->kind == TY_INT) subs += 8;
+		else if(function->lvars->type->kind == TY_PTR) subs += 8;
+		else if(function->lvars->type->kind == TY_ARRAY) subs += function->lvars->type->arraySize * 8;	
+		printf("	sub rsp, %d\n", subs);
+	}
 
 	// Arguments declaration
 	if(function->arg) genStack(function->arg);
