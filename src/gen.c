@@ -172,6 +172,23 @@ void genStack(AST *ast) {
 		printf("	cqo\n");
 		printf("	idiv rdi\n");
 		break;
+	case AST_PTRADD:
+		if(ast->lhs->ty->ptr->kind == TY_INT) printf("	imul rdi, 4\n");
+		else printf("	imul rdi, 8\n");
+		printf("	add rax, rdi\n");
+		break;
+	case AST_PTRSUB:
+		if(ast->lhs->ty->ptr->kind == TY_INT) printf("	imul rdi, 4\n");
+		else printf("	imul rdi, 8\n");
+		printf("	sub rax, rdi\n");
+		break;
+	case AST_PTRDIFF:
+		printf("	sub rax, rdi\n");	
+		printf("	cqo\n");
+		if(ast->lhs->ty->ptr->kind == TY_INT) printf("	mov rdi, 4\n");
+		else printf("	mov rdi, 8\n");
+		printf("	idiv rdi\n");
+		break;
 	case AST_LESS:
 		printf("	cmp rax, rdi\n");
 		printf("	setl al\n");

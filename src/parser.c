@@ -44,6 +44,15 @@ void declare_func() {
 AST *statement() {
 	AST *ast;	
 	if(consume("int")) {
+		Type *lvartype = calloc(1, sizeof(Type));
+		Type *typeBuf = lvartype;
+		while(consume("*")) {
+			typeBuf->kind = TY_PTR;
+			typeBuf->ptr = calloc(1, sizeof(Type));
+			typeBuf = typeBuf->ptr;
+		}
+		typeBuf->kind = TY_INT;
+
 		Token *token = expectIdentifier();
 		ast = newAST(AST_LVAR, NULL, NULL);
 		LVar *lvar = searchLVar(token);
@@ -54,15 +63,7 @@ AST *statement() {
 		lvar->next = lvars;
 		lvar->name = token->str;
 		lvar->len = token->len;
-
-		lvar->type = calloc(1, sizeof(Type));
-		Type *typeBuf = lvar->type;
-		while(consume("*")) {
-			typeBuf = newType(TY_PTR);
-			typeBuf->ptr = calloc(1, sizeof(Type));
-			typeBuf = typeBuf->ptr;
-		}
-		typeBuf->kind = TY_INT;
+		lvar->type = lvartype;
 
 		if(lvars) lvar->offset = lvars->offset + 8;
 		else lvar->offset = 8;
@@ -145,16 +146,16 @@ AST *polynomial() {
 			addType(ast);
 			addType(right);
 			if(ast->ty->kind == TY_INT && right->ty->kind == TY_INT) ast = newAST(AST_ADD, ast, right);
-			else if(ast->ty->ptr && ast->ty->kind == TY_INT) ast = newAST(AST_PTRADD, ast, right);
-			else if(ast->ty->kind == TY_INT && ast->ty->ptr) ast = newAST(AST_PTRADD, right, ast);
+			else if(ast->ty->ptr && right->ty->kind == TY_INT) ast = newAST(AST_PTRADD, ast, right);
+			else if(ast->ty->kind == TY_INT && right->ty->ptr) ast = newAST(AST_PTRADD, right, ast);
 			else error(nowToken->str, "'%.*s'不正なオペランドです。", nowToken->len, nowToken->str);
 		} else if(consume("-")) {
 			right = term();
 			addType(ast);
 			addType(right);
 			if(ast->ty->kind == TY_INT && right->ty->kind == TY_INT) ast = newAST(AST_SUB, ast, right);
-			else if(ast->ty->ptr && ast->ty->kind == TY_INT) ast = newAST(AST_PTRSUB, ast, right);
-			else if(ast->ty->kind == TY_INT && ast->ty->ptr) ast = newAST(AST_PTRDIFF, ast, right);
+			else if(ast->ty->ptr && right->ty->kind == TY_INT) ast = newAST(AST_PTRSUB, ast, right);
+			else if(ast->ty->ptr && right->ty->ptr) ast = newAST(AST_PTRDIFF, ast, right);
 			else error(nowToken->str, "'%.*s'不正なオペランドです。", nowToken->len, nowToken->str);
 		} else {
 			return ast;
@@ -241,7 +242,17 @@ AST *argsp() {
 
 AST *declare_args() {
 	expect("int");
-	Token *arg = consumeIdentifier();
+
+	Type *lvartype = calloc(1, sizeof(Type));
+	Type *typeBuf = lvartype;
+	while(consume("*")) {
+		typeBuf->kind = TY_PTR;
+		typeBuf->ptr = calloc(1, sizeof(Type));
+		typeBuf = typeBuf->ptr;
+	}
+	typeBuf->kind = TY_INT;
+
+	Token *arg = expectIdentifier();
 	AST *ast = newAST(AST_LVAR, NULL, NULL);
 	LVar *lvar = searchLVar(arg);
 	if(lvar) {
@@ -251,14 +262,7 @@ AST *declare_args() {
 		lvar->next = lvars;
 		lvar->name = arg->str;
 		lvar->len = arg->len;
-		lvar->type = calloc(1, sizeof(Type));
-		Type *typeBuf = lvar->type;
-		while(consume("*")) {
-			typeBuf = newType(TY_PTR);
-			typeBuf->ptr = calloc(1, sizeof(Type));
-			typeBuf = typeBuf->ptr;
-		}
-		typeBuf->kind = TY_INT;
+		lvar->type = lvartype;
 		if(lvars) lvar->offset = lvars->offset + 8;
 		else lvar->offset = 8;
 		ast->lvar = lvar;
@@ -273,10 +277,20 @@ AST *declare_argsp() {
 	if(!consume(",")) {
 		return ret;
 	}
-	AST *ast = newAST(AST_LVAR, NULL, NULL);
 	expect("int");
+
+	Type *lvartype = calloc(1, sizeof(Type));
+	Type *typeBuf = lvartype;
+	while(consume("*")) {
+		typeBuf->kind = TY_PTR;
+		typeBuf->ptr = calloc(1, sizeof(Type));
+		typeBuf = typeBuf->ptr;
+	}
+	typeBuf->kind = TY_INT;
+
 	Token *arg = expectIdentifier();
 	LVar *lvar = searchLVar(arg);
+	AST *ast = newAST(AST_LVAR, NULL, NULL);
 	if(lvar) {
 		ast->lvar = lvar;
 	} else {
@@ -284,14 +298,7 @@ AST *declare_argsp() {
 		lvar->next = lvars;
 		lvar->name = arg->str;
 		lvar->len = arg->len;
-		lvar->type = calloc(1, sizeof(Type));
-		Type *typeBuf = lvar->type;
-		while(consume("*")) {
-			typeBuf = newType(TY_PTR);
-			typeBuf->ptr = calloc(1, sizeof(Type));
-			typeBuf = typeBuf->ptr;
-		}
-		typeBuf->kind = TY_INT;
+		lvar->type = lvartype;
 		if(lvars) lvar->offset = lvars->offset + 8;
 		else lvar->offset = 8;
 		ast->lvar = lvar;
