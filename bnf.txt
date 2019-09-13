@@ -2,6 +2,7 @@
 <declare_func>	= "int" IDENTIFIER "(" ("int" IDENTIFIER)? ")" "{" <statement>* "}"
 <statement>		= <expr> ";"
 				  | "int" "*"* IDENTIFIER ";"
+				  | "int" "*"* IDENTIFIER "[" NUMBER "]"
 				  | "{" <statement>* "}"
 				  | "if" "(" <expr> ")" <statement> ("else" <statement>)?
 				  | "while" "(" <expr> ")" <statement>

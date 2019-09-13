@@ -69,6 +69,12 @@ AST *statement() {
 		else lvar->offset = 8;
 		ast->lvar = lvar;
 		lvars = lvar;
+
+		if(consume("[")) {
+			ast->lvar->type->kind = TY_ARRAY;
+			ast->lvar->type->arraySize = expectNumber();
+			expect("]");
+		}
 		expect(";");
 		return ast;
 	} else if(consume("{")) {
