@@ -99,9 +99,11 @@ void genStack(AST *ast) {
 		return;
 	case AST_LVAR:
 		genLval(ast);
-		printf("	pop rax\n");
-		printf("	mov rax, [rax]\n");
-		printf("	push rax\n");
+		if(ast->lvar->type->kind != TY_ARRAY) {
+			printf("	pop rax\n");
+			printf("	mov rax, [rax]\n");
+			printf("	push rax\n");
+		}
 		return;
 	case AST_ARGS:
 		while(ast->lhs != NULL) {

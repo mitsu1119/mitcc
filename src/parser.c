@@ -73,8 +73,11 @@ AST *statement() {
 		lvars = lvar;
 
 		if(consume("[")) {
-			ast->lvar->type->kind = TY_ARRAY;
+			Type *buf = newType(TY_PTR);
+			buf->ptr = ast->lvar->type;
+			ast->lvar->type = buf;
 			ast->lvar->type->arraySize = expectNumber();
+			ast->lvar->type->kind = TY_ARRAY;
 			expect("]");
 		}
 		expect(";");
