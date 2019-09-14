@@ -215,7 +215,15 @@ AST *factor() {
 	Token *token = consumeIdentifier();
 	if(token) {
 		ast = calloc(1, sizeof(AST));
-		if(!consume("(")) {
+		if(consume("(")) {
+			ast->type = AST_CALL;
+			ast->calledFunc = token;
+			ast->lhs = NULL;
+			if(!consume(")")) {
+				ast->lhs = args();
+				expect(")");
+			}
+		} else if(consume("[")) {
 			ast->type = AST_LVAR;
 			LVar *lvar = searchLVar(token);
 			if(lvar) {
@@ -223,13 +231,17 @@ AST *factor() {
 			} else {
 				error(token->str, "変数'%.*s'が宣言されていません。", token->len, token->str);
 			}
+			addType(ast);
+			ast = newAST(AST_PTRADD, ast, polynomial());
+			ast = newAST(AST_DEREF, ast, NULL);
+			expect("]");
 		} else {
-			ast->type = AST_CALL;
-			ast->calledFunc = token;
-			ast->lhs = NULL;
-			if(!consume(")")) {
-				ast->lhs = args();
-				expect(")");
+			ast->type = AST_LVAR;
+			LVar *lvar = searchLVar(token);
+			if(lvar) {
+				ast->lvar = lvar;
+			} else {
+				error(token->str, "変数'%.*s'が宣言されていません。", token->len, token->str);
 			}
 		}
 		return ast;

@@ -16,7 +16,10 @@
 <sign> 			= ("+" | "-")? <factor>
 				  | ("*" | "&")? <sign>
 				  | "sizeof" <sign>
-<factor> 		= NUMBER | IDENTIFIER ("(" <args>? ")")? | "(" <expr> ")"
+<factor> 		= NUMBER
+				  | IDENTIFIER ("(" <args>? ")")?
+				  | "(" <expr> ")"
+				  | IDENTIFIER "[" <polynomial> "]"
 
 <args>			= <expr> <argsp>
 <argsp>			= ("," <expr> <argsp>)?
