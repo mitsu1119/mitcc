@@ -123,8 +123,7 @@ AST *expr() {
 
 AST *assign() {
 	AST *ast;
-	if(consume("*")) ast = newAST(AST_DEREF, equality(), NULL);
-	else ast = equality();
+	ast = equality();
 	if(consume("=")) ast = newAST(AST_ASSIGN, ast, assign());
 	return ast;
 }
@@ -232,8 +231,9 @@ AST *factor() {
 				error(token->str, "変数'%.*s'が宣言されていません。", token->len, token->str);
 			}
 			addType(ast);
-			ast = newAST(AST_PTRADD, ast, polynomial());
+			ast = newAST(AST_PTRADD, ast, expr());
 			ast = newAST(AST_DEREF, ast, NULL);
+			addType(ast);
 			expect("]");
 		} else {
 			ast->type = AST_LVAR;

@@ -19,7 +19,7 @@
 <factor> 		= NUMBER
 				  | IDENTIFIER ("(" <args>? ")")?
 				  | "(" <expr> ")"
-				  | IDENTIFIER "[" <polynomial> "]"
+				  | IDENTIFIER "[" <expr> "]"
 
 <args>			= <expr> <argsp>
 <argsp>			= ("," <expr> <argsp>)?

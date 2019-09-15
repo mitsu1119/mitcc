@@ -23,7 +23,7 @@ void addType(AST *ast) {
 		ast->ty->ptr = ast->lhs->ty;
 		return;
 	case AST_DEREF:
-		if(!ast->lhs->ty->ptr) error(0, "不正なポインタのデリファレンスです、");
+		if(!ast->lhs->ty->ptr) error(nowToken->str, "不正なポインタのデリファレンスです。");
 		ast->ty = ast->lhs->ty->ptr;
 		return;
 	default:
