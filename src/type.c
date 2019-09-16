@@ -15,8 +15,9 @@ void addType(AST *ast) {
 	addType(ast->rhs);
 
 	switch(ast->type) {
-	case AST_LVAR:
-		ast->ty = ast->lvar->type;
+	case AST_PTRADD:
+	case AST_PTRSUB:
+		ast->ty = ast->lhs->ty;
 		return;
 	case AST_ADDR:
 		ast->ty = newType(TY_PTR);
@@ -25,6 +26,9 @@ void addType(AST *ast) {
 	case AST_DEREF:
 		if(!ast->lhs->ty->ptr) error(nowToken->str, "不正なポインタのデリファレンスです。");
 		ast->ty = ast->lhs->ty->ptr;
+		return;
+	case AST_LVAR:
+		ast->ty = ast->lvar->type;
 		return;
 	default:
 		ast->ty = newType(TY_INT);
