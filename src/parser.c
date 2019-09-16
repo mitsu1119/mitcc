@@ -80,15 +80,15 @@ AST *statement() {
 
 		if(lvars) lvar->offset = lvars->offset + 8;
 		else lvar->offset = 8;
-		ast->lvar = lvar;
+		ast->var = lvar;
 		lvars = lvar;
 
 		if(consume("[")) {
 			Type *buf = newType(TY_PTR);
-			buf->ptr = ast->lvar->type;
-			ast->lvar->type = buf;
-			ast->lvar->type->arraySize = expectNumber();
-			ast->lvar->type->kind = TY_ARRAY;
+			buf->ptr = ast->var->type;
+			ast->var->type = buf;
+			ast->var->type->arraySize = expectNumber();
+			ast->var->type->kind = TY_ARRAY;
 			expect("]");
 		}
 		expect(";");
@@ -247,12 +247,18 @@ AST *factor() {
 				expect(")");
 			}
 		} else {
-			ast->type = AST_LVAR;
-			Var *lvar = searchLVar(token);
-			if(lvar) {
-				ast->lvar = lvar;
+			Var *var = searchLVar(token);
+			if(var) {
+				ast->type = AST_LVAR;
+				ast->var = var;
 			} else {
-				error(token->str, "変数'%.*s'が宣言されていません。", token->len, token->str);
+				var = searchGVar(token);
+				if(var) {
+					ast->type = AST_GVAR;
+					ast->var = var;
+				} else {
+					error(token->str, "変数'%.*s'が宣言されていません。", token->len, token->str);
+				}
 			}
 		}
 		return ast;
@@ -295,7 +301,7 @@ AST *declare_args() {
 	AST *ast = newAST(AST_LVAR, NULL, NULL);
 	Var *lvar = searchLVar(arg);
 	if(lvar) {
-		ast->lvar = lvar;
+		ast->var = lvar;
 	} else {
 		lvar = calloc(1, sizeof(Var));
 		lvar->next = lvars;
@@ -304,7 +310,7 @@ AST *declare_args() {
 		lvar->type = lvartype;
 		if(lvars) lvar->offset = lvars->offset + 8;
 		else lvar->offset = 8;
-		ast->lvar = lvar;
+		ast->var = lvar;
 		lvars = lvar;
 	}
 	AST *ret = newAST(AST_ARGDECS, ast, declare_argsp());
@@ -331,7 +337,7 @@ AST *declare_argsp() {
 	Var *lvar = searchLVar(arg);
 	AST *ast = newAST(AST_LVAR, NULL, NULL);
 	if(lvar) {
-		ast->lvar = lvar;
+		ast->var = lvar;
 	} else {
 		lvar = calloc(1, sizeof(Var));
 		lvar->next = lvars;
@@ -340,7 +346,7 @@ AST *declare_argsp() {
 		lvar->type = lvartype;
 		if(lvars) lvar->offset = lvars->offset + 8;
 		else lvar->offset = 8;
-		ast->lvar = lvar;
+		ast->var = lvar;
 		lvars = lvar;
 	}
 	ret->lhs = ast;
@@ -351,6 +357,14 @@ AST *declare_argsp() {
 // Search local variable.
 Var *searchLVar(Token *token) {
 	for(Var *var = lvars; var; var = var->next) {
+		if(var->len == token->len && !strncmp(token->str, var->name, token->len)) return var;
+	}
+	return NULL;
+}
+
+// Search global variable.
+Var *searchGVar(Token *token) {
+	for(Var *var = gvars; var; var = var->next) {
 		if(var->len == token->len && !strncmp(token->str, var->name, token->len)) return var;
 	}
 	return NULL;

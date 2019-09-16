@@ -27,8 +27,9 @@ void addType(AST *ast) {
 		if(!ast->lhs->ty->ptr) error(nowToken->str, "不正なポインタのデリファレンスです。");
 		ast->ty = ast->lhs->ty->ptr;
 		return;
+	case AST_GVAR:
 	case AST_LVAR:
-		ast->ty = ast->lvar->type;
+		ast->ty = ast->var->type;
 		return;
 	default:
 		ast->ty = newType(TY_INT);

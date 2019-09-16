@@ -51,6 +51,9 @@ AST *declare_argsp();
 // Search local variable.
 Var *searchLVar(Token *token);
 
+// Search global variable.
+Var *searchGVar(Token *token);
+
 // Search function.
 Func *searchFunc(Token *token);
 

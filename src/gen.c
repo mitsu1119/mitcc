@@ -16,18 +16,18 @@ int loadInput(const char *filename, const char *debugMode) {
 void codeGen() {
 	// Output assembly base.
 	printf(".intel_syntax noprefix\n");
+	printf(".text\n");
 	printf(".global main\n");
 
-	genGvarCode();
-
 	genFuncCode(funcs);
+	
+	genGvarCode();
 }
 
 // Generate global variable codes.
 void genGvarCode() {
 	while(gvars) {
-		printf("%.*s:\n", gvars->len, gvars->name);
-		printf("	.zero 4\n");
+		printf(".comm	%.*s, 4, 4\n", gvars->len, gvars->name);
 		gvars = gvars->next;
 	}
 }
@@ -66,12 +66,16 @@ void genFuncCode(Func *function) {
 	printf("	ret\n");
 }
 
-// Evaluate the lvalue. If ast type is AST_LVAR, calculate the local variable address and push. Otherwise output error.
-void genLval(AST *ast) {
-	if(ast->type != AST_LVAR) error(0, "代入の左辺値が不正です。");
-	printf("	mov rax, rbp\n");
-	printf("	sub rax, %d\n", ast->lvar->offset);
-	printf("	push rax\n");
+// Evaluate the lvalue or gvalue. If ast type is AST_LVAR, calculate the local variable address and push. Otherwise output error.
+void genVar(AST *ast) {
+	if(ast->type != AST_LVAR && ast->type != AST_GVAR) error(nowToken->str, "変数が不正です。");
+	if(ast->type == AST_LVAR) {
+		printf("	mov rax, rbp\n");
+		printf("	sub rax, %d\n", ast->var->offset);
+		printf("	push rax\n");
+	} else {
+		printf("	push offset %.*s\n", ast->var->len, ast->var->name);
+	}
 }
 
 void genStack(AST *ast) {
@@ -80,7 +84,7 @@ void genStack(AST *ast) {
 	switch(ast->type) {
 	case AST_ARGDECS:
 		while(ast->lhs) {
-			genLval(ast->lhs);
+			genVar(ast->lhs);
 			printf("	pop rax\n");
 			printf("	mov [rax], %s\n", regNames[cnt]);
 			printf("	push %s\n", regNames[cnt++]);
@@ -91,7 +95,7 @@ void genStack(AST *ast) {
 		printf("	push %d\n", ast->val);
 		return;
 	case AST_ADDR:
-		genLval(ast->lhs);
+		genVar(ast->lhs);
 		return;
 	case AST_DEREF:
 		genStack(ast->lhs);
@@ -106,7 +110,7 @@ void genStack(AST *ast) {
 		printf("	push rax\n");
 		return;
 	case AST_ASSIGN:
-		if(ast->lhs->type != AST_DEREF) genLval(ast->lhs);
+		if(ast->lhs->type != AST_DEREF) genVar(ast->lhs);
 		else genStack(ast->lhs->lhs);
 		genStack(ast->rhs);
 		printf("	pop rdi\n");
@@ -114,11 +118,12 @@ void genStack(AST *ast) {
 		printf("	mov [rax], rdi\n");
 		printf("	push rdi\n");
 		return;
+	case AST_GVAR:
 	case AST_LVAR:
-		genLval(ast);
-		if(ast->lvar->type->kind != TY_ARRAY) {
+		genVar(ast);
+		if(ast->var->type->kind != TY_ARRAY) {
 			printf("	pop rax\n");
-			if(ast->lvar->type->kind == TY_INT) {		// int type is 4 bytes.
+			if(ast->var->type->kind == TY_INT) {		// int type is 4 bytes.
 				printf("	mov eax, [rax]\n");			
 				printf("	cdqe\n");
 			} else {

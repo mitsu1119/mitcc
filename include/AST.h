@@ -29,6 +29,7 @@ typedef enum {
 	AsT_IF_ELSE,	// if(a) b else c
 	AST_WHILE,		// while(a) b
 	AST_RETURN,		// return a
+	AST_GVAR,		// g_a
 	AST_LVAR,		// a
 	AST_CALL,		// func()
 	AST_NUM,		// [0-9]+
@@ -41,7 +42,7 @@ struct AST {
 	ASTType type;
 	AST *lhs, *rhs;
 	int val;			// The value (AST_NUM).	
-	Var *lvar;			// Local variable (AST_LVAR).
+	Var *var;			// Variable (AST_LVAR or AST_GVAR).
 	AST *cond;			// Condinate expression (AST_IF, AST_WHILE).
 	Token *calledFunc;	// Called function token (AST_CALL).
 	Type *ty;			// Calc type. (TY_INT, TY_PTR, ...).
