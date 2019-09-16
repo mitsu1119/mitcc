@@ -46,9 +46,7 @@ void genFuncCode(Func *function) {
 		printf("	sub rsp, 0\n");
 	} else {
 		int subs = function->lvars->offset;
-		if(function->lvars->type->kind == TY_INT) subs += 8;
-		else if(function->lvars->type->kind == TY_PTR) subs += 8;
-		else if(function->lvars->type->kind == TY_ARRAY) subs += function->lvars->type->arraySize * (function->lvars->type->ptr->kind == TY_INT) ? 4 : 8;	
+		subs += function->lvars->type->size;
 		printf("	sub rsp, %d\n", subs);
 	}
 
@@ -212,20 +210,17 @@ void genStack(AST *ast) {
 		printf("	idiv rdi\n");
 		break;
 	case AST_PTRADD:
-		if(ast->lhs->ty->ptr->kind == TY_INT) printf("	imul rdi, 4\n");
-		else printf("	imul rdi, 8\n");
+		printf("	imul rdi, %d\n", ast->lhs->ty->ptr->size);
 		printf("	add rax, rdi\n");
 		break;
 	case AST_PTRSUB:
-		if(ast->lhs->ty->ptr->kind == TY_INT) printf("	imul rdi, 4\n");
-		else printf("	imul rdi, 8\n");
+		printf("	imul rdi, %d\n", ast->lhs->ty->ptr->size);
 		printf("	sub rax, rdi\n");
 		break;
 	case AST_PTRDIFF:
 		printf("	sub rax, rdi\n");	
 		printf("	cqo\n");
-		if(ast->lhs->ty->ptr->kind == TY_INT) printf("	mov rdi, 4\n");
-		else printf("	mov rdi, 8\n");
+		printf("	imul rdi, %d\n", ast->lhs->ty->ptr->size);
 		printf("	idiv rdi\n");
 		break;
 	case AST_LESS:

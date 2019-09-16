@@ -15,10 +15,12 @@ void declare() {
 	Type *typeBuf = vartype;
 	while(consume("*")) {
 		typeBuf->kind = TY_PTR;
+		setTypeSize(typeBuf);
 		typeBuf->ptr = calloc(1, sizeof(Type));
 		typeBuf = typeBuf->ptr;
 	}
 	typeBuf->kind = TY_INT;
+	setTypeSize(typeBuf);
 
 	Token *token = expectIdentifier();
 
@@ -71,10 +73,12 @@ AST *statement() {
 		Type *typeBuf = lvartype;
 		while(consume("*")) {
 			typeBuf->kind = TY_PTR;
+			setTypeSize(typeBuf);
 			typeBuf->ptr = calloc(1, sizeof(Type));
 			typeBuf = typeBuf->ptr;
 		}
 		typeBuf->kind = TY_INT;
+		setTypeSize(typeBuf);
 
 		Token *token = expectIdentifier();
 		ast = newAST(AST_LVAR, NULL, NULL);
@@ -99,6 +103,7 @@ AST *statement() {
 			ast->var->type = buf;
 			ast->var->type->arraySize = expectNumber();
 			ast->var->type->kind = TY_ARRAY;
+			setTypeSize(ast->var->type);
 			expect("]");
 		}
 		expect(";");
@@ -302,10 +307,12 @@ AST *declare_args() {
 	Type *typeBuf = lvartype;
 	while(consume("*")) {
 		typeBuf->kind = TY_PTR;
+		setTypeSize(typeBuf);
 		typeBuf->ptr = calloc(1, sizeof(Type));
 		typeBuf = typeBuf->ptr;
 	}
 	typeBuf->kind = TY_INT;
+	setTypeSize(typeBuf);
 
 	Token *arg = expectIdentifier();
 	AST *ast = newAST(AST_LVAR, NULL, NULL);
@@ -338,10 +345,12 @@ AST *declare_argsp() {
 	Type *typeBuf = lvartype;
 	while(consume("*")) {
 		typeBuf->kind = TY_PTR;
+		setTypeSize(typeBuf);
 		typeBuf->ptr = calloc(1, sizeof(Type));
 		typeBuf = typeBuf->ptr;
 	}
 	typeBuf->kind = TY_INT;
+	setTypeSize(typeBuf);
 
 	Token *arg = expectIdentifier();
 	Var *lvar = searchLVar(arg);

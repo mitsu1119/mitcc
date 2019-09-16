@@ -14,11 +14,15 @@ typedef struct Type Type;
 struct Type {
 	TypeKind kind;
 	Type *ptr;
+	int size;
 	unsigned int arraySize;
 };
 
 // Make new type.
 Type *newType(TypeKind kind);
+
+// Set type size.
+void setTypeSize(Type *type);
 
 // Add type for AST.
 void addType(AST *ast);

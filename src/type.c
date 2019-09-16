@@ -4,7 +4,25 @@
 Type *newType(TypeKind kind) {
 	Type *type = calloc(1, sizeof(Type));
 	type->kind = kind;
+	type->arraySize = 0;
+	setTypeSize(type);
 	return type;
+}
+
+// Set type size.
+void setTypeSize(Type *type) {	
+	switch(type->kind) {
+	case TY_INT:
+		type->size = 4;
+		break;
+	case TY_PTR:
+		type->size = 8;
+		break;
+	case TY_ARRAY:
+		setTypeSize(type->ptr);
+		type->size = type->ptr->size * type->arraySize;
+		break;
+	}
 }
 
 // Add type for ASt.
