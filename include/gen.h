@@ -3,6 +3,7 @@
 #include <string.h>
 #include "lexer.h"
 #include "parser.h"
+#include "type.h"
 #include "AST.h"
 
 // Loading codes.

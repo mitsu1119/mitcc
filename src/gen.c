@@ -36,7 +36,7 @@ void genFuncCode(Func *function) {
 		int subs = function->lvars->offset;
 		if(function->lvars->type->kind == TY_INT) subs += 8;
 		else if(function->lvars->type->kind == TY_PTR) subs += 8;
-		else if(function->lvars->type->kind == TY_ARRAY) subs += function->lvars->type->arraySize * 8;	
+		else if(function->lvars->type->kind == TY_ARRAY) subs += function->lvars->type->arraySize * (function->lvars->type->ptr->kind == TY_INT) ? 4 : 8;	
 		printf("	sub rsp, %d\n", subs);
 	}
 
@@ -85,7 +85,13 @@ void genStack(AST *ast) {
 	case AST_DEREF:
 		genStack(ast->lhs);
 		printf("	pop rax\n");
-		printf("	mov rax, [rax]\n");
+		addType(ast->lhs);
+		if(ast->lhs->ty->ptr->kind == TY_INT) {	// int type is 4 bytes.
+			printf("	mov eax, [rax]\n");
+			printf("	cdqe\n");
+		} else {
+			printf("	mov rax, [rax]\n");
+		}
 		printf("	push rax\n");
 		return;
 	case AST_ASSIGN:
@@ -101,7 +107,12 @@ void genStack(AST *ast) {
 		genLval(ast);
 		if(ast->lvar->type->kind != TY_ARRAY) {
 			printf("	pop rax\n");
-			printf("	mov rax, [rax]\n");
+			if(ast->lvar->type->kind == TY_INT) {		// int type is 4 bytes.
+				printf("	mov eax, [rax]\n");			
+				printf("	cdqe\n");
+			} else {
+				printf("	mov rax, [rax]\n");
+			}
 			printf("	push rax\n");
 		}
 		return;
