@@ -16,11 +16,10 @@
 <sign> 			= ("+" | "-")? <factor>
 				  | ("*" | "&")? <sign>
 				  | "sizeof" <sign>
+				  | <factor> "[" <expr> "]"
 <factor> 		= NUMBER
 				  | IDENTIFIER ("(" <args>? ")")?
 				  | "(" <expr> ")"
-				  | IDENTIFIER "[" <expr> "]"
-
 <args>			= <expr> <argsp>
 <argsp>			= ("," <expr> <argsp>)?
 

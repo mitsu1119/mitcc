@@ -199,6 +199,19 @@ AST *sign() {
 		else ast = newNumAST(8);
 	} else {
 		ast = factor();
+		if(consume("[")) {
+			AST *right = expr();
+			addType(ast);
+			addType(right);
+			if(ast->ty->kind == TY_INT && right->ty->kind == TY_INT) ast = newAST(AST_ADD, ast, right);
+			else if(ast->ty->ptr && right->ty->kind == TY_INT) ast = newAST(AST_PTRADD, ast, right);
+			else if(ast->ty->kind == TY_INT && right->ty->ptr) ast = newAST(AST_PTRADD, right, ast);
+			else error(nowToken->str, "'%.*s'不正なオペランドです。", nowToken->len, nowToken->str);
+			addType(ast);
+			ast = newAST(AST_DEREF, ast, NULL);
+			addType(ast);
+			expect("]");
+		}
 	}
 	return ast;
 }
@@ -222,19 +235,6 @@ AST *factor() {
 				ast->lhs = args();
 				expect(")");
 			}
-		} else if(consume("[")) {
-			ast->type = AST_LVAR;
-			LVar *lvar = searchLVar(token);
-			if(lvar) {
-				ast->lvar = lvar;
-			} else {
-				error(token->str, "変数'%.*s'が宣言されていません。", token->len, token->str);
-			}
-			addType(ast);
-			ast = newAST(AST_PTRADD, ast, expr());
-			ast = newAST(AST_DEREF, ast, NULL);
-			addType(ast);
-			expect("]");
 		} else {
 			ast->type = AST_LVAR;
 			LVar *lvar = searchLVar(token);
