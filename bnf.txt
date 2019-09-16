@@ -1,6 +1,6 @@
 <program>		= <declare>*
-<declare>		= "int" IDENTIFIER "(" ("int" IDENTIFIER)? ")" "{" <statement>* "}"
-				  | "int" IDENTIFIER ";"
+<declare>		= "int" "*"* IDENTIFIER "(" ("int" IDENTIFIER)? ")" "{" <statement>* "}"
+				  | "int" "*"* IDENTIFIER ";"
 <statement>		= <expr> ";"
 				  | "int" "*"* IDENTIFIER ";"
 				  | "int" "*"* IDENTIFIER "[" NUMBER "]"

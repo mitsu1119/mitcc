@@ -27,7 +27,8 @@ void codeGen() {
 // Generate global variable codes.
 void genGvarCode() {
 	while(gvars) {
-		printf(".comm	%.*s, 4, 4\n", gvars->len, gvars->name);
+		if(!gvars->type->ptr) printf(".comm	%.*s, 4, 4\n", gvars->len, gvars->name);
+		else printf(".comm	%.*s, 8, 8\n", gvars->len, gvars->name);
 		gvars = gvars->next;
 	}
 }

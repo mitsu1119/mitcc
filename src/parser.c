@@ -10,6 +10,16 @@ void program() {
 
 void declare() {
 	expect("int");
+
+	Type *vartype = calloc(1, sizeof(Type));
+	Type *typeBuf = vartype;
+	while(consume("*")) {
+		typeBuf->kind = TY_PTR;
+		typeBuf->ptr = calloc(1, sizeof(Type));
+		typeBuf = typeBuf->ptr;
+	}
+	typeBuf->kind = TY_INT;
+
 	Token *token = expectIdentifier();
 
 	// Function definition
@@ -30,7 +40,7 @@ void declare() {
 		}
 		Func *func = searchFunc(token);
 		if(func) {
-			error(0, "'%.*s'が再定義されています。", token->len, token->str);
+			error(token->str, "'%.*s'が再定義されています。", token->len, token->str);
 		} else {
 			func = calloc(1, sizeof(Func));
 			func->next = funcs;
@@ -48,7 +58,7 @@ void declare() {
 		gvar->next = gvars;
 		gvar->name = token->str;
 		gvar->len = token->len;
-		gvar->type = newType(TY_INT);
+		gvar->type = vartype;
 		gvars = gvar;
 		expect(";");
 	}
