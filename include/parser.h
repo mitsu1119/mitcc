@@ -10,7 +10,7 @@ typedef struct Token Token;
 // Label counter.
 int labelCnt;
 
-typedef struct LVar LVar;
+typedef struct Var Var;
 typedef struct Func Func;
 struct Func {
 	Func *next;		// Next function.
@@ -18,21 +18,22 @@ struct Func {
 	int len;		// Name length.
 	AST *body;		// Main part.
 	AST *arg;		// Arguments list.
-	LVar *lvars;	// Local variables.
+	Var *lvars;		// Local variables.
 };
 Func *funcs;
 
-struct LVar {
-	LVar *next;		// Next local variable.
+struct Var {
+	Var *next;		// Next variable.
 	Type *type;		// Lvar type.
 	char *name;		// Lvar name.
 	int len;		// Name length.
-	int offset;		// Offset from rbp.
+	int offset;		// Offset from rbp (for local variable).
 };
-LVar *lvars;
+Var *lvars;	// local variables
+Var *gvars;	// global variables
 
 void program();
-void declare_func();
+void declare();
 AST *statement();
 AST *expr();
 AST *assign();
@@ -48,7 +49,7 @@ AST *declare_args();
 AST *declare_argsp();
 
 // Search local variable.
-LVar *searchLVar(Token *token);
+Var *searchLVar(Token *token);
 
 // Search function.
 Func *searchFunc(Token *token);

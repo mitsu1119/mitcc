@@ -15,6 +15,9 @@ static const char *regNames[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
 // Generate assembly code
 void codeGen();
 
+// Generate global variable codes.
+void genGvarCode();
+
 // Generate a function code.
 void genFuncCode(Func *function);
 

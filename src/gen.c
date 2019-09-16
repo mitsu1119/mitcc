@@ -18,7 +18,18 @@ void codeGen() {
 	printf(".intel_syntax noprefix\n");
 	printf(".global main\n");
 
+	genGvarCode();
+
 	genFuncCode(funcs);
+}
+
+// Generate global variable codes.
+void genGvarCode() {
+	while(gvars) {
+		printf("%.*s:\n", gvars->len, gvars->name);
+		printf("	.zero 4\n");
+		gvars = gvars->next;
+	}
 }
 
 // Generate a function code.

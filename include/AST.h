@@ -6,7 +6,7 @@
 
 typedef struct Type Type;
 typedef struct Token Token;
-typedef struct LVar LVar;
+typedef struct Var Var;
 
 // AST type.
 typedef enum {
@@ -41,7 +41,7 @@ struct AST {
 	ASTType type;
 	AST *lhs, *rhs;
 	int val;			// The value (AST_NUM).	
-	LVar *lvar;			// Local variable (AST_LVAR).
+	Var *lvar;			// Local variable (AST_LVAR).
 	AST *cond;			// Condinate expression (AST_IF, AST_WHILE).
 	Token *calledFunc;	// Called function token (AST_CALL).
 	Type *ty;			// Calc type. (TY_INT, TY_PTR, ...).

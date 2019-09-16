@@ -4,42 +4,53 @@ void program() {
 	labelCnt = 0;
 
 	while(!isEOF()) {
-		declare_func();
+		declare();
 	}
 }
 
-void declare_func() {
+void declare() {
 	expect("int");
 	Token *token = expectIdentifier();
-	expect("(");
-	
-	AST *argAST = NULL;
-	if(!consume(")")) {
-		argAST = declare_args();
-		expect(")");
-	}
-	
-	expect("{");
-	AST *ast = newAST(AST_BLOCK, NULL, NULL);
-	AST *block = ast;
-	while(!consume("}")) {
-		block->lhs = statement();
-		block->rhs = newAST(AST_BLOCK, NULL, NULL);
-		block = block->rhs;
-	}
-	Func *func = searchFunc(token);
-	if(func) {
-		error(0, "'%.*s'が再定義されています。", token->len, token->str);
+
+	// Function definition
+	if(consume("(")) {
+		AST *argAST = NULL;
+		if(!consume(")")) {
+			argAST = declare_args();
+			expect(")");
+		}
+		
+		expect("{");
+		AST *ast = newAST(AST_BLOCK, NULL, NULL);
+		AST *block = ast;
+		while(!consume("}")) {
+			block->lhs = statement();
+			block->rhs = newAST(AST_BLOCK, NULL, NULL);
+			block = block->rhs;
+		}
+		Func *func = searchFunc(token);
+		if(func) {
+			error(0, "'%.*s'が再定義されています。", token->len, token->str);
+		} else {
+			func = calloc(1, sizeof(Func));
+			func->next = funcs;
+			func->name = token->str;
+			func->len = token->len;
+			func->body = ast;
+			func->arg = argAST;
+			func->lvars = lvars;	
+			lvars = NULL;
+			funcs = func;
+		}
 	} else {
-		func = calloc(1, sizeof(Func));
-		func->next = funcs;
-		func->name = token->str;
-		func->len = token->len;
-		func->body = ast;
-		func->arg = argAST;
-		func->lvars = lvars;	
-		lvars = NULL;
-		funcs = func;
+		// Global variable
+		Var *gvar = calloc(1, sizeof(Var));
+		gvar->next = gvars;
+		gvar->name = token->str;
+		gvar->len = token->len;
+		gvar->type = newType(TY_INT);
+		gvars = gvar;
+		expect(";");
 	}
 }
 
@@ -57,11 +68,11 @@ AST *statement() {
 
 		Token *token = expectIdentifier();
 		ast = newAST(AST_LVAR, NULL, NULL);
-		LVar *lvar = searchLVar(token);
+		Var *lvar = searchLVar(token);
 		if(lvar) {
 			error(token->str, "'%.*s'が複数回宣言されています。", token->len, token->str);
 		}
-		lvar = calloc(1, sizeof(LVar));
+		lvar = calloc(1, sizeof(Var));
 		lvar->next = lvars;
 		lvar->name = token->str;
 		lvar->len = token->len;
@@ -237,7 +248,7 @@ AST *factor() {
 			}
 		} else {
 			ast->type = AST_LVAR;
-			LVar *lvar = searchLVar(token);
+			Var *lvar = searchLVar(token);
 			if(lvar) {
 				ast->lvar = lvar;
 			} else {
@@ -282,11 +293,11 @@ AST *declare_args() {
 
 	Token *arg = expectIdentifier();
 	AST *ast = newAST(AST_LVAR, NULL, NULL);
-	LVar *lvar = searchLVar(arg);
+	Var *lvar = searchLVar(arg);
 	if(lvar) {
 		ast->lvar = lvar;
 	} else {
-		lvar = calloc(1, sizeof(LVar));
+		lvar = calloc(1, sizeof(Var));
 		lvar->next = lvars;
 		lvar->name = arg->str;
 		lvar->len = arg->len;
@@ -317,12 +328,12 @@ AST *declare_argsp() {
 	typeBuf->kind = TY_INT;
 
 	Token *arg = expectIdentifier();
-	LVar *lvar = searchLVar(arg);
+	Var *lvar = searchLVar(arg);
 	AST *ast = newAST(AST_LVAR, NULL, NULL);
 	if(lvar) {
 		ast->lvar = lvar;
 	} else {
-		lvar = calloc(1, sizeof(LVar));
+		lvar = calloc(1, sizeof(Var));
 		lvar->next = lvars;
 		lvar->name = arg->str;
 		lvar->len = arg->len;
@@ -338,8 +349,8 @@ AST *declare_argsp() {
 }
 
 // Search local variable.
-LVar *searchLVar(Token *token) {
-	for(LVar *var = lvars; var; var = var->next) {
+Var *searchLVar(Token *token) {
+	for(Var *var = lvars; var; var = var->next) {
 		if(var->len == token->len && !strncmp(token->str, var->name, token->len)) return var;
 	}
 	return NULL;
