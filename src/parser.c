@@ -61,7 +61,18 @@ void declare() {
 		gvar->name = token->str;
 		gvar->len = token->len;
 		gvar->type = vartype;
+		setTypeSize(gvar->type);
 		gvars = gvar;
+
+		if(consume("[")) {
+			Type *buf = newType(TY_PTR);
+			buf->ptr = gvar->type;
+			gvar->type = buf;
+			gvar->type->arraySize = expectNumber();
+			gvar->type->kind = TY_ARRAY;
+			setTypeSize(gvar->type);
+			expect("]");
+		}
 		expect(";");
 	}
 }

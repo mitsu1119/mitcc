@@ -3,7 +3,7 @@ int main() {
 	int b;
 	a = 0;
 	b = 0;
-	while(a < 20) {
+	while(a < 100) {
 		b = fibonacci(a);
 		print(b);
 		a = a + 1;

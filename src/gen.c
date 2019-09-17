@@ -1,5 +1,8 @@
 #include "gen.h"
 
+// Registor name list sorted arguments list.
+const char *regNames[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
+
 // Loading codes.
 int loadInput(const char *filename, const char *debugMode) {
 	int fd = open(filename, O_RDONLY);
@@ -27,8 +30,18 @@ void codeGen() {
 // Generate global variable codes.
 void genGvarCode() {
 	while(gvars) {
-		if(!gvars->type->ptr) printf(".comm	%.*s, 4, 4\n", gvars->len, gvars->name);
-		else printf(".comm	%.*s, 8, 8\n", gvars->len, gvars->name);
+		switch(gvars->type->kind) {
+		case TY_INT:
+			printf(".comm	%.*s, 4, 4\n", gvars->len, gvars->name);
+			break;
+		case TY_PTR:
+			printf(".comm	%.*s, 8, 8\n", gvars->len, gvars->name);
+			break;
+		case TY_ARRAY:
+			if(gvars->type->size == 0) printf(".comm	%.*s, %d, 0\n", gvars->len, gvars->name, gvars->type->size);
+			else printf(".comm	%.*s, %d, %d\n", gvars->len, gvars->name, gvars->type->size, (int)pow(2, (int)log2(gvars->type->size)));
+			break;
+		}
 		gvars = gvars->next;
 	}
 }

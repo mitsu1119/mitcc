@@ -1,6 +1,7 @@
 #pragma once
 #include <fcntl.h>
 #include <string.h>
+#include <math.h>
 #include "lexer.h"
 #include "parser.h"
 #include "type.h"
@@ -8,9 +9,6 @@
 
 // Loading codes.
 int loadInput(const char *filename, const char *debugMode);
-
-// Registor name list sorted arguments list.
-static const char *regNames[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
 
 // Generate assembly code
 void codeGen();
