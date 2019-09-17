@@ -78,7 +78,7 @@ void genVar(AST *ast) {
 }
 
 void genStack(AST *ast) {
-	int labelBuf, cnt = 0;
+	int labelBuf, labelBuf2, cnt = 0;
 
 	switch(ast->type) {
 	case AST_ARGDECS:
@@ -141,7 +141,8 @@ void genStack(AST *ast) {
 	case AST_BLOCK:
 		if(ast->lhs != NULL) {
 			genStack(ast->lhs);
-			printf("	pop rax\n");
+			if(ast->lhs->type == AST_IF || ast->lhs->type == AST_WHILE) ;
+			else printf("	pop rax\n");
 			genStack(ast->rhs);
 		}
 		return;
@@ -172,9 +173,10 @@ void genStack(AST *ast) {
 		printf("	pop rax\n");
 		printf("	cmp rax, 0\n");
 		printf("	je .Lend%d\n", labelCnt);
+		labelBuf2 = labelCnt++;
 		genStack(ast->lhs);
 		printf("	jmp .Lbegin%d\n", labelBuf);
-		printf(".Lend%d:\n", labelCnt++);
+		printf(".Lend%d:\n", labelBuf2);
 		return;
 	case AST_RETURN:
 		genStack(ast->lhs);
