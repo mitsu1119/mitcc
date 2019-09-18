@@ -31,6 +31,9 @@ void codeGen() {
 void genGvarCode() {
 	while(gvars) {
 		switch(gvars->type->kind) {
+		case TY_CHAR:
+			printf(".comm	%.*s, 1, 1\n", gvars->len, gvars->name);
+			break;
 		case TY_INT:
 			printf(".comm	%.*s, 4, 4\n", gvars->len, gvars->name);
 			break;
@@ -116,11 +119,12 @@ void genStack(AST *ast) {
 		genStack(ast->lhs);
 		printf("	pop rax\n");
 		addType(ast->lhs);
-		if(ast->lhs->ty->ptr->kind == TY_INT) {	// int type is 4 bytes.
-			printf("	mov eax, [rax]\n");
-			printf("	cdqe\n");
+		if(ast->lhs->ty->ptr->kind == TY_CHAR) {	// char type is 4 byte.
+			printf("	movsx rax, BYTE PTR [rax]\n");
+		} else if(ast->lhs->ty->ptr->kind == TY_INT) {	// int type is 4 byte.
+			printf("	movsx rax, DWORD PTR [rax]\n");
 		} else {
-			printf("	mov rax, [rax]\n");
+			printf("	mov rax, QWORD PTR [rax]\n");
 		}
 		printf("	push rax\n");
 		return;
@@ -128,9 +132,12 @@ void genStack(AST *ast) {
 		if(ast->lhs->type != AST_DEREF) genVar(ast->lhs);
 		else genStack(ast->lhs->lhs);
 		genStack(ast->rhs);
+		addType(ast->rhs);
 		printf("	pop rdi\n");
 		printf("	pop rax\n");
-		printf("	mov [rax], rdi\n");
+		if(ast->rhs->ty->size == 1) printf("	mov BYTE PTR [rax], di");
+		else if(ast->rhs->ty->size == 4) printf("	mov DWORD PTR [rax], edi\n");
+		else printf("	mov QWORD PTR [rax], rdi\n");
 		printf("	push rdi\n");
 		return;
 	case AST_GVAR:
@@ -138,11 +145,12 @@ void genStack(AST *ast) {
 		genVar(ast);
 		if(ast->var->type->kind != TY_ARRAY) {
 			printf("	pop rax\n");
-			if(ast->var->type->kind == TY_INT) {		// int type is 4 bytes.
-				printf("	mov eax, [rax]\n");			
-				printf("	cdqe\n");
+			if(ast->var->type->kind == TY_CHAR) {		// char type is 4 byte.
+				printf("	movsx rax, BYTE PTR [rax]\n");
+			} else if(ast->var->type->kind == TY_INT) {		// int type is 4 byte.
+				printf("	movsx rax, DWORD PTR [rax]\n");			
 			} else {
-				printf("	mov rax, [rax]\n");
+				printf("	mov rax, QWORD PTR [rax]\n");
 			}
 			printf("	push rax\n");
 		}
