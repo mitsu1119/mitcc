@@ -11,7 +11,11 @@ int loadInput(const char *filename, const char *debugMode) {
 	close(fd);
 	nowToken = lexer(userInput);
 
-	if(!strcmp(debugMode, "debug")) printTokens();
+	if(!strcmp(debugMode, "debug")) {	
+		printTokens();
+		printStringLiterals();
+	}
+
 	program();
 }
 
@@ -20,11 +24,14 @@ void codeGen() {
 	// Output assembly base.
 	printf(".intel_syntax noprefix\n");
 	printf(".text\n");
-	printf(".global main\n");
 
-	genFuncCode(funcs);
-	
 	genGvarCode();
+
+	printf(".section	.rodata\n");
+	genStringLiteralCodes();
+
+	printf(".global main\n");
+	genFuncCode(funcs);
 }
 
 // Generate global variable codes.
@@ -46,6 +53,14 @@ void genGvarCode() {
 			break;
 		}
 		gvars = gvars->next;
+	}
+}
+
+// Generate string literals.
+void genStringLiteralCodes() {
+	for(int i = 0; i < nowStringLiteralsNum; i++) {
+		printf(".LC%d:\n", i);
+		printf("	.string \"%s\"\n", stringLiterals[i]);
 	}
 }
 
@@ -111,6 +126,9 @@ void genStack(AST *ast) {
 		return;
 	case AST_NUM:
 		printf("	push %d\n", ast->val);
+		return;
+	case AST_STR:
+		printf("	push offset .LC%d\n", ast->val);
 		return;
 	case AST_ADDR:
 		genVar(ast->lhs);
@@ -211,6 +229,7 @@ void genStack(AST *ast) {
 		return;	
 	case AST_CALL:
 		if(ast->lhs != NULL) genStack(ast->lhs);
+		printf("	xor al, al\n");
 		printf("	call %.*s\n", ast->calledFunc->len, ast->calledFunc->str);
 		printf("	push rax\n");
 		return;

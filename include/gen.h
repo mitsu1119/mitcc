@@ -16,6 +16,9 @@ void codeGen();
 // Generate global variable codes.
 void genGvarCode();
 
+// Generate string literals.
+void genStringLiteralCodes();
+
 // Generate a function code.
 void genFuncCode(Func *function);
 

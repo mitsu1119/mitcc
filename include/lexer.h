@@ -19,6 +19,7 @@ typedef enum {
 	TK_RETURN,		// Return token.
 	TK_SIZEOF,		// Sizeof token.
 	TK_NUM,			// Number token.
+	TK_STR,			// String literal token.
 	TK_EOF			// File end.
 } TokenKind;
 
@@ -37,11 +38,15 @@ Token *nowToken;
 char checkSingleletterReserved(char p);
 char *checkMultiletterReserved(char *p);
 
+#define stringLiteralsSize 100
+extern char *stringLiterals[];
+extern int nowStringLiteralsNum;
+
 // If next token is expected reserved word, read token and return true. Otherwise return false.
 bool consume(char *op);
 
-// If next token's kind is expected kind, read token and return true. Otherwise return false.
-bool consumeKind(TokenKind kind);
+// If next token's kind is expected kind. Otherwise return false.
+Token *consumeKind(TokenKind kind);
 
 // If next token is expected reserved word, read token. Otherwise output error.
 void expect(char *op);
@@ -60,6 +65,10 @@ bool isEOF();
 
 // Make new token and connect the token to current.
 Token *newToken(TokenKind kind, Token *current, char *str, int len);
+
+// Make new string token and connect the token to current.
+// Arg "str" has to null end.
+Token *newStringToken(Token *current, char *str);
 
 // Show token lists.
 void printTokens();

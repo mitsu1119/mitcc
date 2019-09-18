@@ -21,6 +21,7 @@
 <factor> 		= NUMBER
 				  | IDENTIFIER ("(" <args>? ")")?
 				  | "(" <expr> ")"
+				  | "\"" STRING "\""
 <args>			= <expr> <argsp>
 <argsp>			= ("," <expr> <argsp>)?
 <declare_args>	= IDENTIFIER <declare_argsp>

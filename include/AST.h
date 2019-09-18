@@ -33,6 +33,7 @@ typedef enum {
 	AST_LVAR,		// a
 	AST_CALL,		// func()
 	AST_NUM,		// [0-9]+
+	AST_STR,		// "hoge"
 	AST_ARGDECS		// func(a, b, c)
 } ASTType;
 
@@ -41,7 +42,7 @@ typedef struct AST AST;
 struct AST {
 	ASTType type;
 	AST *lhs, *rhs;
-	int val;			// The value (AST_NUM).	
+	int val;			// The value (AST_NUM) or string literal number (AST_STR).	
 	Var *var;			// Variable (AST_LVAR or AST_GVAR).
 	AST *cond;			// Condinate expression (AST_IF, AST_WHILE).
 	Token *calledFunc;	// Called function token (AST_CALL).

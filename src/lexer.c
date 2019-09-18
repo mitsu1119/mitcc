@@ -1,8 +1,11 @@
 #include "lexer.h"
 
+char *stringLiterals[stringLiteralsSize] = {NULL};
+int nowStringLiteralsNum = 0;
+
 char checkSingleletterReserved(char p) {
 	// Punctutor.
-	static char spuncts[] = {'+', '-', '*', '/', '>', '<', ';', '=', '(', ')', '[', ']', '{', '}', ',', '&'};
+	static char spuncts[] = {'+', '-', '*', '/', '>', '<', ';', '=', '(', ')', '[', ']', '{', '}', ',', '&', '"'};
 	for(int i = 0; i < sizeof(spuncts) / sizeof(char); i++) {
 		if(p == spuncts[i]) return spuncts[i];
 	}
@@ -32,11 +35,12 @@ bool consume(char *op) {
 	return true;
 }
 
-// If next token's kind is expected kind, read token and return true. Otherwise return false.
-bool consumeKind(TokenKind kind) {
-	if(nowToken->kind != kind) return false;
+// If next token's kind is expected kind. Otherwise return false.
+Token *consumeKind(TokenKind kind) {
+	if(nowToken->kind != kind) return NULL;
+	Token *oldToken = nowToken;
 	nowToken = nowToken->next;
-	return true;
+	return oldToken;
 }
 
 // If next token is expected reserved word, read token. Otherwise output error.
@@ -88,6 +92,18 @@ Token *newToken(TokenKind kind, Token *current, char *str, int len) {
 	return token;
 }
 
+// Make new string token and connect the token to current.
+// Arg "str" has to null end.
+Token *newStringToken(Token *current, char *str) {
+	Token *token = calloc(1, sizeof(Token));
+	token->kind = TK_STR;
+	token->str = str;
+	token->len = strlen(str);
+	current->next = token;
+	token->val = nowStringLiteralsNum;
+	return token;
+}
+
 // Show token lists.
 void printTokens() {
 	Token *token = nowToken;
@@ -98,6 +114,13 @@ void printTokens() {
 		else printf("%.*s\n", token->len, token->str);
 		token = token->next;
 	}
+	printf("----------------------------------\n");
+}
+
+// Show string literals.
+void printStringLiterals() {
+	printf("----------- String ---------------\n");
+	for(int i = 0; i < nowStringLiteralsNum; i++) printf("%s len: %ld\n", stringLiterals[i], strlen(stringLiterals[i]));
 	printf("----------------------------------\n");
 }
 
@@ -136,6 +159,22 @@ Token *lexer(char *p) {
 		}
 		
 		char c = checkSingleletterReserved(*p);
+		
+		// string literal
+		if(c == '"') {
+			p++;
+			char *s = p;
+			do {
+				c = *p++;
+			} while(c != '"');
+			int len = p - s - 1;
+			stringLiterals[nowStringLiteralsNum] = (char *)malloc(sizeof(char) * len + 1);
+			memcpy(stringLiterals[nowStringLiteralsNum], s, len);
+			current = newStringToken(current, stringLiterals[nowStringLiteralsNum]);
+			nowStringLiteralsNum++;
+			continue;
+		}
+
 		if(c != 0) {
 			current = newToken(TK_RESERVED, current, p++, 1);
 			continue;

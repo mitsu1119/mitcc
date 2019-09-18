@@ -225,13 +225,20 @@ AST *sign() {
 
 AST *factor() {
 	AST *ast;
+	Token *token = consumeKind(TK_STR);
+	if(token) {
+		ast = newAST(AST_STR, NULL, NULL);
+		ast->val = token->val;
+		return ast;
+	}
+
 	if(consume("(")) {
 		ast = expr();
 		expect(")");
 		return ast;
 	}
 
-	Token *token = consumeIdentifier();
+	token = consumeIdentifier();
 	if(token) {
 		ast = calloc(1, sizeof(AST));
 		if(consume("(")) {
