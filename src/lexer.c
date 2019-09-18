@@ -11,7 +11,7 @@ char checkSingleletterReserved(char p) {
 
 char *checkMultiletterReserved(char *p) {
 	// Keyword.
-	static char *mkeywords[] = {"return", "if", "else", "while", "int", "sizeof"};
+	static char *mkeywords[] = {"return", "if", "else", "while", "int", "char", "sizeof"};
 	for(int i = 0; i < sizeof(mkeywords) / sizeof(*mkeywords); i++) {
 		if(!strncmp(p, mkeywords[i], strlen(mkeywords[i])) && !isalnum(p[strlen(mkeywords[i])]) && p[strlen(mkeywords[i])] != '_') return mkeywords[i];
 	}

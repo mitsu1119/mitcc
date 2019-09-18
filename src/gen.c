@@ -59,7 +59,10 @@ void genFuncCode(Func *function) {
 		printf("	sub rsp, 0\n");
 	} else {
 		int subs = function->lvars->offset;
-		subs += function->lvars->type->size;
+		if(function->lvars->type->kind == TY_ARRAY && function->lvars->type->arraySize != 0) subs += function->lvars->type->ptr->size * (function->lvars->type->arraySize - 1);
+
+		// 16 byte alignment.
+		if((subs & 15) != 0) subs += 16 - subs % 16;
 		printf("	sub rsp, %d\n", subs);
 	}
 

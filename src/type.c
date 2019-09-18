@@ -9,11 +9,26 @@ Type *newType(TypeKind kind) {
 	return type;
 }
 
+// Pointer type.
+bool isPointerType(Type *type) {
+	if(type->ptr) return true;
+	switch(type->kind) {
+	case TY_INT:
+	case TY_CHAR:
+		return false;
+	default:
+		return true;
+	}
+}
+
 // Set type size.
 void setTypeSize(Type *type) {	
 	switch(type->kind) {
 	case TY_INT:
 		type->size = 4;
+		break;
+	case TY_CHAR:
+		type->size = 1;
 		break;
 	case TY_PTR:
 		type->size = 8;

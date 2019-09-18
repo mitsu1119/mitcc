@@ -1,9 +1,9 @@
 <program>		= <declare>*
-<declare>		= "int" "*"* IDENTIFIER "(" ("int" IDENTIFIER)? ")" "{" <statement>* "}"
-				  | "int" "*"* IDENTIFIER ("[" NUMBER "]")? ";"
+<declare>		= <typep> IDENTIFIER "(" ("int" IDENTIFIER)? ")" "{" <statement>* "}"
+				  | <typep> IDENTIFIER ("[" NUMBER "]")? ";"
 <statement>		= <expr> ";"
-				  | "int" "*"* IDENTIFIER ";"
-				  | "int" "*"* IDENTIFIER "[" NUMBER "]"
+				  | <typep> IDENTIFIER ";"
+				  | <typep> IDENTIFIER "[" NUMBER "]"
 				  | "{" <statement>* "}"
 				  | "if" "(" <expr> ")" <statement> ("else" <statement>)?
 				  | "while" "(" <expr> ")" <statement>
@@ -23,6 +23,6 @@
 				  | "(" <expr> ")"
 <args>			= <expr> <argsp>
 <argsp>			= ("," <expr> <argsp>)?
-
 <declare_args>	= IDENTIFIER <declare_argsp>
 <declare_argsp>	= ("," IDENTIFIER)?
+<typep>			= ("int" | "char") "*"*

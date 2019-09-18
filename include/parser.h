@@ -47,9 +47,13 @@ AST *args();
 AST *argsp();
 AST *declare_args();
 AST *declare_argsp();
+Type *typep();
 
 // Search local variable.
 Var *searchLVar(Token *token);
+
+// Make local variable and add lvars.
+Var *makeLVar(Token *token, Type *type);
 
 // Search global variable.
 Var *searchGVar(Token *token);

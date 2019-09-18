@@ -6,6 +6,7 @@ typedef struct AST AST;
 // Type data
 typedef enum {
 	TY_INT,
+	TY_CHAR,
 	TY_PTR,
 	TY_ARRAY
 } TypeKind;
@@ -20,6 +21,9 @@ struct Type {
 
 // Make new type.
 Type *newType(TypeKind kind);
+
+// Pointer type.
+bool isPointerType(Type *type);
 
 // Set type size.
 void setTypeSize(Type *type);

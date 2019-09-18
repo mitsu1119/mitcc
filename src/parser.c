@@ -9,20 +9,10 @@ void program() {
 }
 
 void declare() {
-	expect("int");
-
-	Type *vartype = calloc(1, sizeof(Type));
-	Type *typeBuf = vartype;
-	while(consume("*")) {
-		typeBuf->kind = TY_PTR;
-		setTypeSize(typeBuf);
-		typeBuf->ptr = calloc(1, sizeof(Type));
-		typeBuf = typeBuf->ptr;
-	}
-	typeBuf->kind = TY_INT;
-	setTypeSize(typeBuf);
+	Type *vartype = typep();
 
 	Token *token = expectIdentifier();
+	if(!vartype) error(token->str, "'%.*s'の型がありません。", token->len, token->str);
 
 	// Function definition
 	if(consume("(")) {
@@ -79,34 +69,15 @@ void declare() {
 
 AST *statement() {
 	AST *ast;	
-	if(consume("int")) {
-		Type *lvartype = calloc(1, sizeof(Type));
-		Type *typeBuf = lvartype;
-		while(consume("*")) {
-			typeBuf->kind = TY_PTR;
-			setTypeSize(typeBuf);
-			typeBuf->ptr = calloc(1, sizeof(Type));
-			typeBuf = typeBuf->ptr;
-		}
-		typeBuf->kind = TY_INT;
-		setTypeSize(typeBuf);
-
+	Type *lvartype = typep();
+	if(lvartype) {
 		Token *token = expectIdentifier();
 		ast = newAST(AST_LVAR, NULL, NULL);
 		Var *lvar = searchLVar(token);
 		if(lvar) {
 			error(token->str, "'%.*s'が複数回宣言されています。", token->len, token->str);
 		}
-		lvar = calloc(1, sizeof(Var));
-		lvar->next = lvars;
-		lvar->name = token->str;
-		lvar->len = token->len;
-		lvar->type = lvartype;
-
-		if(lvars) lvar->offset = lvars->offset + 8;
-		else lvar->offset = 8;
-		ast->var = lvar;
-		lvars = lvar;
+		ast->var = makeLVar(token, lvartype);
 
 		if(consume("[")) {
 			Type *buf = newType(TY_PTR);
@@ -192,17 +163,17 @@ AST *polynomial() {
 			right = term();
 			addType(ast);
 			addType(right);
-			if(ast->ty->kind == TY_INT && right->ty->kind == TY_INT) ast = newAST(AST_ADD, ast, right);
-			else if(ast->ty->ptr && right->ty->kind == TY_INT) ast = newAST(AST_PTRADD, ast, right);
-			else if(ast->ty->kind == TY_INT && right->ty->ptr) ast = newAST(AST_PTRADD, right, ast);
+			if(!isPointerType(ast->ty) && !isPointerType(right->ty)) ast = newAST(AST_ADD, ast, right);
+			else if(isPointerType(ast->ty) && !isPointerType(right->ty)) ast = newAST(AST_PTRADD, ast, right);
+			else if(!isPointerType(ast->ty) && isPointerType(right->ty)) ast = newAST(AST_PTRADD, right, ast);
 			else error(nowToken->str, "'%.*s'不正なオペランドです。", nowToken->len, nowToken->str);
 		} else if(consume("-")) {
 			right = term();
 			addType(ast);
 			addType(right);
-			if(ast->ty->kind == TY_INT && right->ty->kind == TY_INT) ast = newAST(AST_SUB, ast, right);
-			else if(ast->ty->ptr && right->ty->kind == TY_INT) ast = newAST(AST_PTRSUB, ast, right);
-			else if(ast->ty->ptr && right->ty->ptr) ast = newAST(AST_PTRDIFF, ast, right);
+			if(!isPointerType(ast->ty) && !isPointerType(right->ty)) ast = newAST(AST_SUB, ast, right);
+			else if(isPointerType(ast->ty) && !isPointerType(right->ty)) ast = newAST(AST_PTRSUB, ast, right);
+			else if(isPointerType(ast->ty) && isPointerType(right->ty)) ast = newAST(AST_PTRDIFF, ast, right);
 			else error(nowToken->str, "'%.*s'不正なオペランドです。", nowToken->len, nowToken->str);
 		} else {
 			return ast;
@@ -232,17 +203,16 @@ AST *sign() {
 	} else if(consumeKind(TK_SIZEOF)) {
 		ast = sign();
 		addType(ast);
-		if(ast->ty->kind == TY_INT) ast = newNumAST(4);
-		else ast = newNumAST(8);
+		ast = newNumAST(ast->ty->size);
 	} else {
 		ast = factor();
 		if(consume("[")) {
 			AST *right = expr();
 			addType(ast);
 			addType(right);
-			if(ast->ty->kind == TY_INT && right->ty->kind == TY_INT) ast = newAST(AST_ADD, ast, right);
-			else if(ast->ty->ptr && right->ty->kind == TY_INT) ast = newAST(AST_PTRADD, ast, right);
-			else if(ast->ty->kind == TY_INT && right->ty->ptr) ast = newAST(AST_PTRADD, right, ast);
+			if(!isPointerType(ast->ty) && !isPointerType(right->ty)) ast = newAST(AST_ADD, ast, right);
+			else if(isPointerType(ast->ty) && !isPointerType(right->ty)) ast = newAST(AST_PTRADD, ast, right);
+			else if(!isPointerType(ast->ty) && isPointerType(right->ty)) ast = newAST(AST_PTRADD, right, ast);
 			else error(nowToken->str, "'%.*s'不正なオペランドです。", nowToken->len, nowToken->str);
 			addType(ast);
 			ast = newAST(AST_DEREF, ast, NULL);
@@ -312,34 +282,17 @@ AST *argsp() {
 }
 
 AST *declare_args() {
-	expect("int");
-
-	Type *lvartype = calloc(1, sizeof(Type));
-	Type *typeBuf = lvartype;
-	while(consume("*")) {
-		typeBuf->kind = TY_PTR;
-		setTypeSize(typeBuf);
-		typeBuf->ptr = calloc(1, sizeof(Type));
-		typeBuf = typeBuf->ptr;
-	}
-	typeBuf->kind = TY_INT;
-	setTypeSize(typeBuf);
+	Type *lvartype = typep();
 
 	Token *arg = expectIdentifier();
+	if(!lvartype) error(arg->str, "'%.*s'に型がありません。", arg->len, arg->str);
+
 	AST *ast = newAST(AST_LVAR, NULL, NULL);
 	Var *lvar = searchLVar(arg);
 	if(lvar) {
 		ast->var = lvar;
 	} else {
-		lvar = calloc(1, sizeof(Var));
-		lvar->next = lvars;
-		lvar->name = arg->str;
-		lvar->len = arg->len;
-		lvar->type = lvartype;
-		if(lvars) lvar->offset = lvars->offset + 8;
-		else lvar->offset = 8;
-		ast->var = lvar;
-		lvars = lvar;
+		ast->var = makeLVar(arg, lvartype);
 	}
 	AST *ret = newAST(AST_ARGDECS, ast, declare_argsp());
 	return ret;
@@ -350,38 +303,44 @@ AST *declare_argsp() {
 	if(!consume(",")) {
 		return ret;
 	}
-	expect("int");
 
-	Type *lvartype = calloc(1, sizeof(Type));
-	Type *typeBuf = lvartype;
+	Type *lvartype = typep();
+
+	Token *arg = expectIdentifier();
+	if(!lvartype) error(arg->str, "'%.*s'に型がありません。", arg->len, arg->str);
+
+	Var *lvar = searchLVar(arg);
+	AST *ast = newAST(AST_LVAR, NULL, NULL);
+	if(lvar) {
+		ast->var = lvar;
+	} else {
+		ast->var = makeLVar(arg, lvartype);
+	}
+	ret->lhs = ast;
+	ret->rhs = declare_argsp();
+	return ret;
+}
+
+Type *typep() {	
+	TypeKind kind;
+	
+	if(consume("int")) kind = TY_INT;
+	else if(consume("char")) kind = TY_CHAR;
+	else return NULL;
+
+	Type *vartype = calloc(1, sizeof(Type));
+	Type *typeBuf = vartype;
 	while(consume("*")) {
 		typeBuf->kind = TY_PTR;
 		setTypeSize(typeBuf);
 		typeBuf->ptr = calloc(1, sizeof(Type));
 		typeBuf = typeBuf->ptr;
 	}
-	typeBuf->kind = TY_INT;
+	typeBuf->kind = kind;
 	setTypeSize(typeBuf);
+	setTypeSize(vartype);
 
-	Token *arg = expectIdentifier();
-	Var *lvar = searchLVar(arg);
-	AST *ast = newAST(AST_LVAR, NULL, NULL);
-	if(lvar) {
-		ast->var = lvar;
-	} else {
-		lvar = calloc(1, sizeof(Var));
-		lvar->next = lvars;
-		lvar->name = arg->str;
-		lvar->len = arg->len;
-		lvar->type = lvartype;
-		if(lvars) lvar->offset = lvars->offset + 8;
-		else lvar->offset = 8;
-		ast->var = lvar;
-		lvars = lvar;
-	}
-	ret->lhs = ast;
-	ret->rhs = declare_argsp();
-	return ret;
+	return vartype;
 }
 
 // Search local variable.
@@ -390,6 +349,23 @@ Var *searchLVar(Token *token) {
 		if(var->len == token->len && !strncmp(token->str, var->name, token->len)) return var;
 	}
 	return NULL;
+}
+
+// Make local variable and add lvars.
+Var *makeLVar(Token *token, Type *type) {
+	Var *lvar = calloc(1, sizeof(Var));
+	lvar->next = lvars;
+	lvar->name = token->str;
+	lvar->len = token->len;
+	lvar->type = type;
+	if(lvars) {
+		if(lvars->type->kind == TY_ARRAY && lvars->type->arraySize < 2) lvar->offset = lvars->type->ptr->size * (lvars->type->arraySize - 1) + lvars->offset + lvar->type->size;
+		else lvar->offset = lvars->offset + 8;
+	} else {
+		lvar->offset = 8;
+	}
+	lvars = lvar;
+	return lvar;
 }
 
 // Search global variable.
