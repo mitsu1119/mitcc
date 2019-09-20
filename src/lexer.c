@@ -137,6 +137,21 @@ Token *lexer(char *p) {
 			continue;
 		}
 
+		// Skip line comment.
+		if(!strncmp(p, "//", 2)) {
+			p += 2;
+			while(*p != '\n') p++;
+			continue;
+		}
+
+		// Skipt block comment.
+		if(!strncmp(p, "/*", 2)) {
+			char *q = strstr(p + 2, "*/");
+			if(!q) error(p, "コメントが閉じられていません。");
+			p = q + 2;
+			continue;
+		}
+
 		// Multi letter reserved. ex) "<=", ">="
 		char *ch = checkMultiletterReserved(p);
 		if(ch) {

@@ -20,7 +20,7 @@ void error(char *loc, char *fmt, ...) {
 		fprintf(stderr, "%.*s\n", (int)(end - line), line);
 
 		int pos = loc - line + indent;
-		fprintf(stderr, "%*s", pos, " ");
+		fprintf(stderr, "%*s", pos, "");
 		fprintf(stderr, "^ ");
 		vfprintf(stderr, fmt, ap);
 		fprintf(stderr, "\n");
