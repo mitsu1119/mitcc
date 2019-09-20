@@ -55,6 +55,9 @@ Var *searchLVar(Token *token);
 // Make local variable and add lvars.
 Var *makeLVar(Token *token, Type *type);
 
+// Change lvar to array type.
+void toArray(Var *var);
+
 // Search global variable.
 Var *searchGVar(Token *token);
 

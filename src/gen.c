@@ -87,7 +87,7 @@ void genFuncCode(Func *function) {
 		printf("	sub rsp, 0\n");
 	} else {
 		int subs = function->lvars->offset;
-		if(function->lvars->type->kind == TY_ARRAY && function->lvars->type->arraySize != 0) subs += function->lvars->type->ptr->size * (function->lvars->type->arraySize - 1);
+		// if(function->lvars->type->kind == TY_ARRAY && function->lvars->type->arraySize != 0) subs += function->lvars->type->ptr->size * (function->lvars->type->arraySize - 1);
 
 		// 16 byte alignment.
 		if((subs & 15) != 0) subs += 16 - subs % 16;
@@ -163,7 +163,7 @@ void genStack(AST *ast) {
 		addType(ast->rhs);
 		printf("	pop rdi\n");
 		printf("	pop rax\n");
-		if(ast->rhs->ty->size == 1) printf("	mov BYTE PTR [rax], di");
+		if(ast->rhs->ty->size == 1) printf("	mov BYTE PTR [rax], dil\n");
 		else if(ast->rhs->ty->size == 4) printf("	mov DWORD PTR [rax], edi\n");
 		else printf("	mov QWORD PTR [rax], rdi\n");
 		printf("	push rdi\n");

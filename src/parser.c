@@ -55,12 +55,7 @@ void declare() {
 		gvars = gvar;
 
 		if(consume("[")) {
-			Type *buf = newType(TY_PTR);
-			buf->ptr = gvar->type;
-			gvar->type = buf;
-			gvar->type->arraySize = expectNumber();
-			gvar->type->kind = TY_ARRAY;
-			setTypeSize(gvar->type);
+			toArray(gvar);
 			expect("]");
 		}
 		expect(";");
@@ -80,12 +75,7 @@ AST *statement() {
 		ast->var = makeLVar(token, lvartype);
 
 		if(consume("[")) {
-			Type *buf = newType(TY_PTR);
-			buf->ptr = ast->var->type;
-			ast->var->type = buf;
-			ast->var->type->arraySize = expectNumber();
-			ast->var->type->kind = TY_ARRAY;
-			setTypeSize(ast->var->type);
+			toArray(ast->var);
 			expect("]");
 		}
 		expect(";");
@@ -366,13 +356,23 @@ Var *makeLVar(Token *token, Type *type) {
 	lvar->len = token->len;
 	lvar->type = type;
 	if(lvars) {
-		if(lvars->type->kind == TY_ARRAY && lvars->type->arraySize < 2) lvar->offset = lvars->type->ptr->size * (lvars->type->arraySize - 1) + lvars->offset + lvar->type->size;
-		else lvar->offset = lvars->offset + 8;
+		lvar->offset = lvars->offset + 8;
 	} else {
 		lvar->offset = 8;
 	}
 	lvars = lvar;
 	return lvar;
+}
+
+// Change lvar to array type.
+void toArray(Var *var) {
+	Type *buf = newType(TY_PTR);
+	buf->ptr = var->type;
+	var->type = buf;
+	var->type->arraySize = expectNumber();
+	var->type->kind = TY_ARRAY;
+	var->offset += var->type->ptr->size * (var->type->arraySize - 1);
+	setTypeSize(var->type);
 }
 
 // Search global variable.
