@@ -5,10 +5,20 @@ const char *regNames[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
 
 // Loading codes.
 int loadInput(const char *filename, const char *debugMode) {
-	int fd = open(filename, O_RDONLY);
-	if(fd == -1) exit(1);
-	read(fd, userInput, sizeof(userInput) * sizeof(char));
-	close(fd);
+	FILE *fp = fopen(filename, "r");
+	if(!fp) error(NULL, "ファイルが開けません。");
+
+	fseek(fp, 0, SEEK_END);
+	size_t length = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
+
+	userInput = (char *)calloc(1, length + 2);
+	fread(userInput, length, 1, fp);
+
+	if(length == 0 || userInput[length - 1] != '\n') userInput[length++] = '\n';
+	userInput[length] = '\0';
+	fclose(fp);
+
 	nowToken = lexer(userInput);
 
 	if(!strcmp(debugMode, "debug")) {	

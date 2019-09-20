@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-char userInput[0x100];
+char *userInput;
 
 void error(char *loc, char *fmt, ...);
 

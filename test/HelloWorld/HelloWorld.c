@@ -1,5 +1,5 @@
 int main() {
-	write(0, "HelloWorld!!\n", 13);
+	printf("HelloWorld!!\n");
 	return 0;
 }
 
