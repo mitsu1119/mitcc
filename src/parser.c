@@ -77,6 +77,10 @@ AST *statement() {
 		if(consume("[")) {
 			toArray(ast->var);
 			expect("]");
+		} else {
+			if(consume("=")) {
+				ast = newAST(AST_ASSIGN, ast, assign());
+			}
 		}
 		expect(";");
 		return ast;

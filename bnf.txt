@@ -2,7 +2,7 @@
 <declare>		= <typep> IDENTIFIER "(" ("int" IDENTIFIER)? ")" "{" <statement>* "}"
 				  | <typep> IDENTIFIER ("[" NUMBER "]")? ";"
 <statement>		= <expr> ";"
-				  | <typep> IDENTIFIER ";"
+				  | <typep> IDENTIFIER ("=" <assign>)? ";"
 				  | <typep> IDENTIFIER "[" NUMBER "]"
 				  | "{" <statement>* "}"
 				  | "if" "(" <expr> ")" <statement> ("else" <statement>)?

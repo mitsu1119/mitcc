@@ -1,8 +1,6 @@
 int main() {
-	char a;
-	int b;
-	a = 0;
-	b = 0;
+	char a = 0;
+	int b = 0;
 	while(a < 100) {
 		b = fibonacci(a);
 		print(b);
