@@ -46,21 +46,47 @@ void codeGen() {
 
 // Generate global variable codes.
 void genGvarCode() {
+	Var *buf = gvars;
+
+	// .comm
 	while(gvars) {
-		switch(gvars->type->kind) {
-		case TY_CHAR:
-			printf(".comm	%.*s, 1, 1\n", gvars->len, gvars->name);
-			break;
-		case TY_INT:
-			printf(".comm	%.*s, 4, 4\n", gvars->len, gvars->name);
-			break;
-		case TY_PTR:
-			printf(".comm	%.*s, 8, 8\n", gvars->len, gvars->name);
-			break;
-		case TY_ARRAY:
-			if(gvars->type->size == 0) printf(".comm	%.*s, %d, 0\n", gvars->len, gvars->name, gvars->type->size);
-			else printf(".comm	%.*s, %d, %d\n", gvars->len, gvars->name, gvars->type->size, (int)pow(2, (int)log2(gvars->type->size)));
-			break;
+		if(gvars->isBss) {
+			switch(gvars->type->size) {
+			case 1:
+				printf(".comm	%.*s, 1, 1\n", gvars->len, gvars->name);
+				break;
+			case 4:
+				printf(".comm	%.*s, 4, 4\n", gvars->len, gvars->name);
+				break;
+			case 8:
+				printf(".comm	%.*s, 8, 8\n", gvars->len, gvars->name);
+				break;
+			default:
+				// array
+				if(gvars->type->size == 0) printf(".comm	%.*s, %d, 0\n", gvars->len, gvars->name, gvars->type->size);
+				else printf(".comm	%.*s, %d, %d\n", gvars->len, gvars->name, gvars->type->size, (int)pow(2, (int)log2(gvars->type->size)));
+				break;
+			}
+		}
+		gvars = gvars->next;
+	}
+
+	// .data
+	printf(".data\n");
+	gvars = buf;
+	while(gvars) {
+		if(!gvars->isBss) {
+			printf("%.*s:\n", gvars->len, gvars->name);
+			switch(gvars->type->size) {
+			case 1:
+				printf("	.byte %d\n", gvars->init);
+				break;
+			case 4:
+				printf("	.long %d\n", gvars->init);
+				break;
+			case 8:
+				printf("	.quad %d\n", gvars->init);
+			}
 		}
 		gvars = gvars->next;
 	}

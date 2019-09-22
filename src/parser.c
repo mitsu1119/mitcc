@@ -51,10 +51,16 @@ void declare() {
 		gvar->name = token->str;
 		gvar->len = token->len;
 		gvar->type = vartype;
+		gvar->isBss = true;
 		setTypeSize(gvar->type);
 		gvars = gvar;
 
-		if(consume("[")) {
+		if(!consume("[")) {
+			if(consume("=")) {
+				gvar->isBss = false;
+				gvar->init = expectNumber();
+			}
+		} else {
 			toArray(gvar);
 			expect("]");
 		}

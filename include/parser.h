@@ -28,6 +28,8 @@ struct Var {
 	char *name;		// Lvar name.
 	int len;		// Name length.
 	int offset;		// Offset from rbp (for local variable).
+	bool isBss;		// Whether has not been initialized.
+	int init;		// Initial data.
 };
 Var *lvars;	// local variables
 Var *gvars;	// global variables
