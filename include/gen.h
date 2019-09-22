@@ -25,5 +25,8 @@ void genFuncCode(Func *function);
 // Evaluate the lvalue or gvalue. If ast type is AST_LVAR, calculate the local variable address and push. Otherwise output error.
 void genVar(AST *ast);
 
+// Generate a arguments list code.
+void genArgList(AST *ast, int cnt);
+
 // Generate assembly code from ast.
 void genStack(AST *ast);

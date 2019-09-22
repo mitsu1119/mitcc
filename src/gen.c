@@ -147,8 +147,18 @@ void genVar(AST *ast) {
 	}
 }
 
+// Generate a arguments list code.
+void genArgList(AST *ast, int cnt) {
+	if(!ast->lhs) return;
+	genArgList(ast->rhs, cnt + 1);
+	genStack(ast->lhs);
+	printf("	pop %s\n", regNames[cnt]);
+	return;
+}
+
 void genStack(AST *ast) {
 	int labelBuf, labelBuf2, cnt = 0;
+	AST *astBuf;
 
 	switch(ast->type) {
 	case AST_ARGDECS:
@@ -210,11 +220,7 @@ void genStack(AST *ast) {
 		}
 		return;
 	case AST_ARGS:
-		while(ast->lhs != NULL) {
-			genStack(ast->lhs);
-			printf("	pop %s\n", regNames[cnt++]);
-			ast = ast->rhs;
-		}
+		genArgList(ast, 0);
 		return;
 	case AST_BLOCK:
 		if(ast->lhs != NULL) {
